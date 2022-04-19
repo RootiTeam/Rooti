@@ -11,7 +11,7 @@ Build JAR file
 -------------
 - `git submodule update --init`
 - `apt install -y maven`
-- `cd lib && mvn install:install-file -Dfile=leveldb.jar -DgroupId=com.tinfoiled.mcpe.leveldb -DartifactId=leveldb -Dversion=0.8 -Dpackaging=jar && cd ..`
+- `mvn install:install-file -Dfile=leveldb.jar -DgroupId=com.tinfoiled.mcpe.leveldb -DartifactId=leveldb -Dversion=0.8 -Dpackaging=jar`
 - `mvn clean && mvn package`
 
 Running
