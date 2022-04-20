@@ -134,6 +134,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
     protected String deviceModel;
 
+    protected int inputMode;
+
     protected Vector3 forceMovement = null;
 
     protected Vector3 teleportPosition = null;
@@ -243,6 +245,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
     public Integer getDeviceOS() {
         return deviceOS;
+    }
+
+    public Integer getClientInput() {
+        return inputMode;
     }
 
     @Override
@@ -1996,6 +2002,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     this.randomClientId = loginPacket.clientId;
                     this.deviceOS = loginPacket.deviceOS;
                     this.deviceModel = loginPacket.deviceModel;
+                    this.inputMode = loginPacket.clientInput;
 
                     this.uuid = loginPacket.clientUUID;
                     this.rawUUID = Binary.writeUUID(this.uuid);
