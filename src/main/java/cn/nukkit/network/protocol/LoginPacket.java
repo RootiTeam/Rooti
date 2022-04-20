@@ -15,6 +15,7 @@ import java.util.UUID;
 
 /**
  * Created by on 15-10-13.
+ * Updated by ob 20-04-22.
  */
 public class LoginPacket extends DataPacket {
 
@@ -27,6 +28,7 @@ public class LoginPacket extends DataPacket {
     public byte gameEdition;
     public UUID clientUUID;
     public long clientId;
+    public int clientInput;
 
     public Skin skin;
 
@@ -78,6 +80,7 @@ public class LoginPacket extends DataPacket {
         if (skinToken.has("DeviceOS")) this.deviceOS = skinToken.get("DeviceOS").getAsInt();
         if (skinToken.has("SkinId")) skinId = skinToken.get("SkinId").getAsString();
         if (skinToken.has("SkinData")) this.skin = new Skin(skinToken.get("SkinData").getAsString(), skinId);
+        if (skinToken.has("CurrentInputMode")) this.clientInput = skinToken.get("CurrentInputMode").getAsInt();
     }
 
     private JsonObject decodeToken(String token) {
