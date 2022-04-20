@@ -18,4 +18,4 @@ Build JAR file
 Running
 -------------
 - `cd target && export TERM=xterm-color`
-- `java -jar nukkit-1.0-SNAPSHOT.jar`
+- `java -jar rooti-1.0.1.jar`
