@@ -3,11 +3,13 @@ package cn.nukkit.entity.passive;
 import cn.nukkit.Player;
 import cn.nukkit.entity.data.ByteEntityData;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
+import cn.nukkit.network.protocol.AddEntityPacket;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemDye;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.utils.DyeColor;
+import java.util.Random;
 
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -126,16 +128,35 @@ public class EntitySheep extends EntityAnimal {
 
     private int randomColor() {
         ThreadLocalRandom random = ThreadLocalRandom.current();
-        double rand = random.nextDouble(1, 100);
-
-        if (rand <= 0.164) {
-            return DyeColor.PINK.getDyedData();
-        }
-
-        if (rand <= 15) {
-            return random.nextBoolean() ? DyeColor.BLACK.getDyedData() : random.nextBoolean() ? DyeColor.GRAY.getDyedData() : DyeColor.LIGHT_GRAY.getDyedData();
-        }
-
-        return DyeColor.WHITE.getDyedData();
+        Random rand = new Random();
+        int[] colors = {DyeColor.GREEN.getDyedData(), 
+        DyeColor.PINK.getDyedData(), DyeColor.ORANGE.getDyedData(), 
+        DyeColor.MAGENTA.getDyedData(), 
+        DyeColor.WHITE.getDyedData(),
+        DyeColor.LIGHT_BLUE.getDyedData(), 
+        DyeColor.YELLOW.getDyedData(), DyeColor.GRAY.getDyedData(), 
+        DyeColor.CYAN.getDyedData(), DyeColor.BLACK.getDyedData(), 
+        DyeColor.RED.getDyedData(), 
+        DyeColor.BROWN.getDyedData(), 
+        DyeColor.BLUE.getDyedData()};
+        return colors[rand.nextInt(colors.length)];
     }
+
+    @Override
+    public void spawnTo(Player player) {
+        AddEntityPacket pk = new AddEntityPacket();
+        pk.type = this.getNetworkId();
+        pk.entityUniqueId = this.getId();
+        pk.entityRuntimeId = this.getId();
+        pk.x = (float) this.x;
+        pk.y = (float) this.y;
+        pk.z = (float) this.z;
+        pk.speedX = (float) this.motionX;
+        pk.speedY = (float) this.motionY;
+        pk.speedZ = (float) this.motionZ;
+        pk.metadata = this.dataProperties;
+        player.dataPacket(pk);
+
+        super.spawnTo(player);
+        } 
 }
