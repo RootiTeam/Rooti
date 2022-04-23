@@ -1,10 +1,12 @@
 package cn.nukkit.network.protocol;
 
 import cn.nukkit.item.Item;
+import lombok.ToString;
 
 /**
  * @author Nukkit Project Team
  */
+@ToString
 public class DropItemPacket extends DataPacket {
 
     public static final byte NETWORK_ID = ProtocolInfo.DROP_ITEM_PACKET;
