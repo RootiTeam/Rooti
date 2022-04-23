@@ -18,4 +18,4 @@ Build JAR file
 Running
 -------------
 - `cd target && export TERM=xterm-color`
-- `java -jar rooti-1.0.1.jar`
+- `java -Xmx1G -Xms1G -jar rooti-1.0.1.jar`
