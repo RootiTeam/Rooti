@@ -1,10 +1,12 @@
 package cn.nukkit.network.protocol;
 
+import lombok.ToString;
 import cn.nukkit.math.BlockVector3;
 
 /**
  * @author Nukkit Project Team
  */
+@ToString
 public class RemoveBlockPacket extends DataPacket {
 
     public static final byte NETWORK_ID = ProtocolInfo.REMOVE_BLOCK_PACKET;

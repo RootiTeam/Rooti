@@ -2,11 +2,13 @@ package cn.nukkit.network.protocol;
 
 import cn.nukkit.command.data.CommandArgs;
 import com.google.gson.Gson;
+import lombok.ToString;
 
 /**
  * author: MagicDroidX
  * Nukkit Project
  */
+@ToString
 public class CommandStepPacket extends DataPacket {
 
     public static final byte NETWORK_ID = ProtocolInfo.COMMAND_STEP_PACKET;

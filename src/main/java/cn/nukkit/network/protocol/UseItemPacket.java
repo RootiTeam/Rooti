@@ -1,5 +1,6 @@
 package cn.nukkit.network.protocol;
 
+import lombok.ToString;
 import cn.nukkit.item.Item;
 import cn.nukkit.math.BlockVector3;
 import cn.nukkit.math.Vector3f;
@@ -7,6 +8,7 @@ import cn.nukkit.math.Vector3f;
 /**
  * @author Nukkit Project Team
  */
+@ToString
 public class UseItemPacket extends DataPacket {
 
     public static final byte NETWORK_ID = ProtocolInfo.USE_ITEM_PACKET;

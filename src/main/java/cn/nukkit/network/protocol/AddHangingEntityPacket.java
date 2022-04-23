@@ -1,7 +1,9 @@
 package cn.nukkit.network.protocol;
 
 import cn.nukkit.math.BlockVector3;
+import lombok.ToString;
 
+@ToString
 public class AddHangingEntityPacket extends DataPacket {
     public static final byte NETWORK_ID = ProtocolInfo.ADD_HANGING_ENTITY_PACKET;
 

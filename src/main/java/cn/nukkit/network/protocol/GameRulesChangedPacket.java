@@ -1,11 +1,13 @@
 package cn.nukkit.network.protocol;
 
+import lombok.ToString;
 import cn.nukkit.utils.RuleData;
 
 /**
  * author: MagicDroidX
  * Nukkit Project
  */
+@ToString
 public class GameRulesChangedPacket extends DataPacket {
     public static final byte NETWORK_ID = ProtocolInfo.GAME_RULES_CHANGED_PACKET;
 

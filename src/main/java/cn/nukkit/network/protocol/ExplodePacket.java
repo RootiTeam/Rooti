@@ -1,11 +1,13 @@
 package cn.nukkit.network.protocol;
 
+import lombok.ToString;
 import cn.nukkit.math.Vector3;
 
 /**
  * author: MagicDroidX
  * Nukkit Project
  */
+@ToString
 public class ExplodePacket extends DataPacket {
 
     public static final byte NETWORK_ID = ProtocolInfo.EXPLODE_PACKET;

@@ -209,6 +209,7 @@ public class RakNetInterface implements ServerInstance, AdvancedSourceInterface 
         this.handler.sendOption("name",
                 "MCPE;" + Utils.rtrim(name.replace(";", "\\;"), '\\') + ";" +
                         ProtocolInfo.CURRENT_PROTOCOL + ";" +
+                        ProtocolInfo.MINECRAFT_VERSION_NETWORK + ";" +
                         info.getPlayerCount() + ";" +
                         info.getMaxPlayerCount());
     }

@@ -1,7 +1,9 @@
 package cn.nukkit.network.protocol;
 
+import lombok.ToString;
 import cn.nukkit.item.Item;
 
+@ToString
 public class InventoryActionPacket extends DataPacket {
 
     public static final byte NETWORK_ID = ProtocolInfo.INVENTORY_ACTION_PACKET;

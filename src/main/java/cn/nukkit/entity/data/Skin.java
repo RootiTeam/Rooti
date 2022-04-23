@@ -10,11 +10,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.Base64;
+import lombok.ToString;
 
 /**
  * author: MagicDroidX
  * Nukkit Project
  */
+@ToString(exclude = {"skinData", "capeData", "geometryData"})
 public class Skin {
 
     public static final int SINGLE_SKIN_SIZE = 64 * 32 * 4;

@@ -1,11 +1,13 @@
 package cn.nukkit.network.protocol;
 
+import lombok.ToString;
 import cn.nukkit.item.Item;
 
 /**
  * author: MagicDroidX
  * Nukkit Project
  */
+@ToString
 public class MobEquipmentPacket extends DataPacket {
     public static final byte NETWORK_ID = ProtocolInfo.MOB_EQUIPMENT_PACKET;
 

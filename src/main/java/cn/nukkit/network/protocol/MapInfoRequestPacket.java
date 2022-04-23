@@ -1,8 +1,10 @@
 package cn.nukkit.network.protocol;
 
+import lombok.ToString;
 /**
  * Created by CreeperFace on 5.3.2017.
  */
+@ToString
 public class MapInfoRequestPacket extends DataPacket {
     public long mapId;
 

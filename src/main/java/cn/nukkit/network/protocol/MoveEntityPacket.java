@@ -1,11 +1,13 @@
 package cn.nukkit.network.protocol;
 
+import lombok.ToString;
 import cn.nukkit.math.Vector3f;
 
 /**
  * author: MagicDroidX
  * Nukkit Project
  */
+@ToString
 public class MoveEntityPacket extends DataPacket {
     public static final byte NETWORK_ID = ProtocolInfo.MOVE_ENTITY_PACKET;
 

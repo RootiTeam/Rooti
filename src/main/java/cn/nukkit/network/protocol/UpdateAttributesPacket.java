@@ -1,10 +1,12 @@
 package cn.nukkit.network.protocol;
 
+import lombok.ToString;
 import cn.nukkit.entity.Attribute;
 
 /**
  * @author Nukkit Project Team
  */
+@ToString
 public class UpdateAttributesPacket extends DataPacket {
 
     public static final byte NETWORK_ID = ProtocolInfo.UPDATE_ATTRIBUTES_PACKET;

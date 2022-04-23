@@ -1,7 +1,9 @@
 package cn.nukkit.network.protocol;
 
+import lombok.ToString;
 import cn.nukkit.resourcepacks.ResourcePack;
 
+@ToString
 public class ResourcePacksInfoPacket extends DataPacket {
 
     public static final byte NETWORK_ID = ProtocolInfo.RESOURCE_PACKS_INFO_PACKET;

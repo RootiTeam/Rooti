@@ -1,5 +1,6 @@
 package cn.nukkit.network.protocol;
 
+import lombok.ToString;
 import cn.nukkit.entity.data.Skin;
 import cn.nukkit.utils.Zlib;
 import com.google.gson.Gson;
@@ -17,6 +18,7 @@ import java.util.UUID;
  * Created by on 15-10-13.
  * Updated by ob 20-04-22.
  */
+@ToString
 public class LoginPacket extends DataPacket {
 
     public static final byte NETWORK_ID = ProtocolInfo.LOGIN_PACKET;

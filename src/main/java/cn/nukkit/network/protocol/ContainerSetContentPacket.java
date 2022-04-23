@@ -1,11 +1,13 @@
 package cn.nukkit.network.protocol;
 
 import cn.nukkit.item.Item;
+import lombok.ToString;
 
 /**
  * author: MagicDroidX
  * Nukkit Project
  */
+@ToString
 public class ContainerSetContentPacket extends DataPacket {
     public static final byte NETWORK_ID = ProtocolInfo.CONTAINER_SET_CONTENT_PACKET;
 
