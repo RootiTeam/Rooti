@@ -26,6 +26,7 @@ public class CameraPacket extends DataPacket {
 	public void encode() {
 		this.reset();
 		this.putVarLong(eid);
+		this.putVarLong(eid);
 	}
 
 	public String getName() {
