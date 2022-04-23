@@ -9,7 +9,6 @@ import cn.nukkit.item.ItemDye;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.utils.DyeColor;
-import java.util.Random;
 
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -128,18 +127,7 @@ public class EntitySheep extends EntityAnimal {
 
     private int randomColor() {
         ThreadLocalRandom random = ThreadLocalRandom.current();
-        Random rand = new Random();
-        int[] colors = {DyeColor.GREEN.getDyedData(), 
-        DyeColor.PINK.getDyedData(), DyeColor.ORANGE.getDyedData(), 
-        DyeColor.MAGENTA.getDyedData(), 
-        DyeColor.WHITE.getDyedData(),
-        DyeColor.LIGHT_BLUE.getDyedData(), 
-        DyeColor.YELLOW.getDyedData(), DyeColor.GRAY.getDyedData(), 
-        DyeColor.CYAN.getDyedData(), DyeColor.BLACK.getDyedData(), 
-        DyeColor.RED.getDyedData(), 
-        DyeColor.BROWN.getDyedData(), 
-        DyeColor.BLUE.getDyedData()};
-        return colors[rand.nextInt(colors.length)];
+        return DyeColor.values()[random.nextInt(DyeColor.values().length)].getDyedData();
     }
 
     @Override

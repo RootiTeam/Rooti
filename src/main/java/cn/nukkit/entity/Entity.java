@@ -28,6 +28,7 @@ import cn.nukkit.network.protocol.MobEffectPacket;
 import cn.nukkit.network.protocol.RemoveEntityPacket;
 import cn.nukkit.network.protocol.SetEntityDataPacket;
 import cn.nukkit.network.protocol.SetEntityMotionPacket;
+import cn.nukkit.network.protocol.SetEntityLinkPacket;
 import cn.nukkit.plugin.Plugin;
 import cn.nukkit.potion.Effect;
 import cn.nukkit.utils.ChunkException;
@@ -770,6 +771,14 @@ public abstract class Entity extends Location implements Metadatable {
     public void spawnTo(Player player) {
         if (!this.hasSpawned.containsKey(player.getLoaderId()) && player.usedChunks.containsKey(Level.chunkHash(this.chunk.getX(), this.chunk.getZ()))) {
             this.hasSpawned.put(player.getLoaderId(), player);
+        }
+        if (this.riding != null) {
+            SetEntityLinkPacket pkk = new SetEntityLinkPacket();
+            pkk.rider = this.riding.getId();
+            pkk.riding = this.getId();
+            pkk.type = 1;
+
+            player.dataPacket(pkk);
         }
     }
 

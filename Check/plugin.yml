@@ -1,0 +1,8 @@
+name: Check
+main: ratnikov.Main
+version: "1.1.0dev"
+api: ["1.0.0"]
+
+load: POSTWORLD
+author: David Ratnikov
+website: https://rooti.ru/

@@ -36,10 +36,7 @@ import cn.nukkit.item.enchantment.Enchantment;
 import cn.nukkit.item.food.Food;
 import cn.nukkit.lang.TextContainer;
 import cn.nukkit.lang.TranslationContainer;
-import cn.nukkit.level.ChunkLoader;
-import cn.nukkit.level.Level;
-import cn.nukkit.level.Location;
-import cn.nukkit.level.Position;
+import cn.nukkit.level.*;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.level.format.generic.BaseFullChunk;
 import cn.nukkit.level.particle.CriticalParticle;
@@ -162,7 +159,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
     protected int chunkLoadCount = 0;
     protected Map<Long, Integer> loadQueue = new HashMap<>();
-    protected int nextChunkOrderRun = 5;
+    protected int nextChunkOrderRun = 1;
 
     protected Map<UUID, Player> hiddenPlayers = new HashMap<>();
 
@@ -736,7 +733,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         int count = 0;
 
         List<Map.Entry<Long, Integer>> entryList = new ArrayList<>(this.loadQueue.entrySet());
-        entryList.sort(Comparator.comparingInt(Map.Entry::getValue));
+        if (entryList.size() + chunkLoadCount > spawnThreshold) {
+            entryList.sort(Comparator.comparingInt(Map.Entry::getValue));
+        }
 
         for (Map.Entry<Long, Integer> entry : entryList) {
             long index = entry.getKey();
@@ -802,12 +801,23 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         this.server.getPluginManager().callEvent(respawnEvent);
 
         pos = respawnEvent.getRespawnPosition();
-
-        RespawnPacket respawnPacket = new RespawnPacket();
-        respawnPacket.x = (float) pos.x;
-        respawnPacket.y = (float) pos.y;
-        respawnPacket.z = (float) pos.z;
-        this.dataPacket(respawnPacket);
+        /*
+         * TODO: Fast spawn.
+         */
+        if(this.getHealth() <= 0) {
+            RespawnPacket respawnPk = new RespawnPacket();
+            pos = this.getSpawn();
+            respawnPk.x = (float) pos.x;
+            respawnPk.y = (float) pos.y;
+            respawnPk.z = (float) pos.z;
+            this.dataPacket(respawnPk);
+        }else{
+            RespawnPacket respawnPk = new RespawnPacket();
+            respawnPk.x = (float) pos.x;
+            respawnPk.y = (float) pos.y;
+            respawnPk.z = (float) pos.z;
+            this.dataPacket(respawnPk);
+        }
 
         PlayStatusPacket playStatusPacket = new PlayStatusPacket();
         playStatusPacket.status = PlayStatusPacket.PLAYER_SPAWN;
@@ -837,8 +847,15 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             }
         }
 
-        this.sendExperience(this.getExperience());
-        this.sendExperienceLevel(this.getExperienceLevel());
+        int experience = this.getExperience();
+        if (experience != 0) {
+            this.sendExperience(experience);
+        }
+
+        int level = this.getExperienceLevel();
+        if (level != 0) {
+            this.sendExperienceLevel(this.getExperienceLevel());
+        }
 
         this.teleport(pos, null); // Prevent PlayerTeleportEvent during player spawn
 
@@ -846,22 +863,17 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             this.spawnToAll();
         }
 
-        //todo Updater
-
-        if (this.getHealth() <= 0) {
-            respawnPacket = new RespawnPacket();
-            pos = this.getSpawn();
-            respawnPacket.x = (float) pos.x;
-            respawnPacket.y = (float) pos.y;
-            respawnPacket.z = (float) pos.z;
-            this.dataPacket(respawnPacket);
-        }
-
         //Weather
+        if (this.level.isRaining() || this.level.isThundering()) {
+            this.getLevel().sendWeather(this);
+        }
         this.getLevel().sendWeather(this);
 
         //FoodLevel
-        this.getFoodData().sendFoodLevel();
+        PlayerFood food = this.getFoodData();
+        if (food.getLevel() != food.getMaxLevel()) {
+            food.sendFoodLevel();
+        }
     }
 
     protected boolean orderChunks() {
@@ -873,22 +885,27 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
         this.nextChunkOrderRun = 200;
 
-        Map<Long, Integer> newOrder = new HashMap<>();
+        loadQueue.clear();
         Map<Long, Boolean> lastChunk = new HashMap<>(this.usedChunks);
 
         int centerX = (int) this.x >> 4;
         int centerZ = (int) this.z >> 4;
         int count = 0;
 
-        for (int x = -this.chunkRadius; x <= this.chunkRadius; x++) {
-            for (int z = -this.chunkRadius; z <= this.chunkRadius; z++) {
-                int chunkX = x + centerX;
-                int chunkZ = z + centerZ;
-                int distance = (int) Math.sqrt((double) x * x + (double) z * z);
-                if (distance <= this.chunkRadius) {
-                    long index;
-                    if (!(this.usedChunks.containsKey(index = Level.chunkHash(chunkX, chunkZ))) || !this.usedChunks.get(index)) {
-                        newOrder.put(index, distance);
+        int radius = spawned ? this.chunkRadius : (int) Math.ceil(Math.sqrt(spawnThreshold));
+
+        int radiusSqr = radius * radius;
+        for (int x = -radius; x <= radius; x++) {
+            int xx = x * x;
+            int chunkX = x + centerX;
+            for (int z = -radius; z <= radius; z++) {
+                int distanceSqr = xx + z * z;
+                if (distanceSqr <= radiusSqr) {
+                    int chunkZ = z + centerZ;
+                    long index = Level.chunkHash(chunkX, chunkZ);
+                    Boolean value = this.usedChunks.get(index);
+                    if (value == null || !value) {
+                        this.loadQueue.put(index, distanceSqr);
                         count++;
                     }
                     lastChunk.remove(index);
@@ -896,11 +913,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             }
         }
 
-        for (long index : new ArrayList<>(lastChunk.keySet())) {
+        for (long index : lastChunk.keySet()) {
             this.unloadChunk(Level.getHashX(index), Level.getHashZ(index));
         }
 
-        this.loadQueue = newOrder;
         Timings.playerChunkOrderTimer.stopTiming();
         return true;
     }
@@ -1700,14 +1716,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             return;
         }
 
-        if (this.nextChunkOrderRun-- <= 0 || this.chunk == null) {
-            this.orderChunks();
-        }
-
-        if (!this.loadQueue.isEmpty() || !this.spawned) {
-            this.sendNextChunk();
-        }
-
         if (!this.batchedPackets.isEmpty()) {
             for (int channel : this.batchedPackets.keySet()) {
                 this.server.batchPackets(new Player[]{this}, batchedPackets.get(channel).stream().toArray(DataPacket[]::new), false);
@@ -1715,6 +1723,13 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             this.batchedPackets = new TreeMap<>();
         }
 
+        if (this.nextChunkOrderRun-- <= 0 || this.chunk == null) {
+            this.orderChunks();
+        }
+
+        if (!this.loadQueue.isEmpty() || !this.spawned) {
+            this.sendNextChunk();
+        }
     }
 
     public boolean canInteract(Vector3 pos, double maxDistance) {

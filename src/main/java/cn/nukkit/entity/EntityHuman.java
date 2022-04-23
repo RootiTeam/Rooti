@@ -2,6 +2,7 @@ package cn.nukkit.entity;
 
 import cn.nukkit.Player;
 import cn.nukkit.entity.data.IntPositionEntityData;
+import cn.nukkit.network.protocol.SetEntityLinkPacket;
 import cn.nukkit.entity.data.Skin;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
@@ -155,6 +156,15 @@ public class EntityHuman extends EntityHumanType {
             player.dataPacket(pk);
 
             this.inventory.sendArmorContents(player);
+
+            if (this.riding != null) {
+                SetEntityLinkPacket pkk = new SetEntityLinkPacket();
+                pkk.rider = this.riding.getId();
+                pkk.riding = this.getId();
+                pkk.type = 1;
+
+                player.dataPacket(pkk);
+            }
 
             if (!(this instanceof Player)) {
                 this.server.removePlayerListData(this.getUniqueId(), new Player[]{player});

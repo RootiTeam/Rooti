@@ -2,6 +2,7 @@ package cn.nukkit.entity.mob;
 
 import cn.nukkit.Player;
 import cn.nukkit.item.Item;
+import cn.nukkit.item.ItemBow;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.AddEntityPacket;
@@ -59,7 +60,7 @@ public class EntitySkeleton extends EntityMob {
 
         MobEquipmentPacket packet = new MobEquipmentPacket();
         packet.eid = this.getId();
-        packet.item = new Item(Item.BOW);
+        packet.item = new ItemBow();
         packet.slot = 0;
         packet.selectedSlot = 0;
         packet.windowId = 0;
