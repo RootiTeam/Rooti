@@ -16,7 +16,6 @@ dependencies {
     implementation("com.google.guava:guava:31.1-jre")
     implementation("com.google.code.gson:gson:2.9.0")
     implementation("org.yaml:snakeyaml:1.30")
-    implementation("org.jline:jline:3.21.0")
     implementation("io.netty:netty-all:4.1.76.Final")
     compileOnly("org.projectlombok:lombok:1.18.24")
     annotationProcessor("org.projectlombok:lombok:1.18.24")
