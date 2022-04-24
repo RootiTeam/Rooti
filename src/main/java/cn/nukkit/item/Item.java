@@ -784,7 +784,7 @@ public class Item implements Cloneable {
             list[JUNGLE_DOOR] = ItemDoorJungle.class; //429
             list[ACACIA_DOOR] = ItemDoorAcacia.class; //430
             list[DARK_OAK_DOOR] = ItemDoorDarkOak.class; //431
-            //TODO: list[CHORUS_FRUIT] = ItemChorusFruit.class; //432
+            list[CHORUS_FRUIT] = ItemChorusFruit.class; //432
             //TODO: list[POPPED_CHORUS_FRUIT] = ItemChorusFruitPopped.class; //433
 
             //TODO: list[DRAGON_BREATH] = ItemDragonBreath.class; //437
@@ -1589,6 +1589,10 @@ public class Item implements Cloneable {
         CompoundTag tag = this.getNamedTag();
         return tag.contains("BlockEntityTag") && tag.get("BlockEntityTag") instanceof CompoundTag;
 
+    }
+
+    public boolean onUse(Player player, int ticksUsed) {
+        return false;
     }
 
     public Item clearCustomBlockData() {

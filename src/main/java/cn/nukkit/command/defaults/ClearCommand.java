@@ -19,7 +19,7 @@ public class ClearCommand extends VanillaCommand {
     @Override
     public boolean execute(CommandSender sender, String commandLabel, String[] args) {
         if (!(sender instanceof Player)) {
-            sender.sendMessage(new TranslationContainer("commands.generic.usage", this.usageMessage));
+            sender.sendMessage(new TranslationContainer(TextFormat.RED + "%commands.generic.ingame"));
             return true;
         } else {
              if (sender.hasPermission("nukkit.command.clear")) {

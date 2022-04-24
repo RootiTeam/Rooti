@@ -706,7 +706,9 @@ public class Level implements ChunkManager, Metadatable {
         this.timings.doTick.startTiming();
 
         this.checkTime();
-
+       if (currentTick % 1200 == 0) {
+            this.sendTime();
+        }
         // Tick Weather
         this.rainTime--;
         if (this.rainTime <= 0) {

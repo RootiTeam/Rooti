@@ -189,6 +189,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     private int exp = 0;
     private int expLevel = 0;
 
+    protected int lastChorusFruitTeleport = 20;
+
     protected PlayerFood foodData = null;
 
     private Entity killer = null;
@@ -1523,7 +1525,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     if (!to.equals(ev.getTo())) { //If plugins modify the destination
                         this.teleport(ev.getTo(), null);
                     } else {
-                        this.addMovement(this.x, this.y + this.getEyeHeight(), this.z, this.yaw, this.pitch, this.yaw);
+                        this.sendPosition(new Vector3(this.x, this.y, this.z), this.yaw, this.pitch, MovePlayerPacket.MODE_NORMAL, this.getViewers().values().toArray(new Player[0]));
                     }
                 } else {
                     this.blocksAround = blocksAround;
@@ -4766,6 +4768,14 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     @Override
     public void onChunkChanged(FullChunk chunk) {
         this.usedChunks.remove(Level.chunkHash(chunk.getX(), chunk.getZ()));
+    }
+
+    public int getLastChorusFruitTeleport() {
+        return lastChorusFruitTeleport;
+    }
+
+    public void onChorusFruitTeleport() {
+        this.lastChorusFruitTeleport = this.server.getTick();
     }
 
     @Override
