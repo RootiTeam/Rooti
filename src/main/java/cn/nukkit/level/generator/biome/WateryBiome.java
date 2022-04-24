@@ -2,6 +2,9 @@ package cn.nukkit.level.generator.biome;
 
 import cn.nukkit.block.Block;
 import cn.nukkit.block.BlockDirt;
+import cn.nukkit.block.BlockClay;
+import cn.nukkit.block.BlockSand;
+import cn.nukkit.block.BlockStone;
 
 /**
  * author: Angelic47
@@ -10,11 +13,10 @@ import cn.nukkit.block.BlockDirt;
 public abstract class WateryBiome extends NormalBiome implements CaveBiome {
     public WateryBiome() {
         this.setGroundCover(new Block[]{
-                new BlockDirt(),
-                new BlockDirt(),
-                new BlockDirt(),
-                new BlockDirt(),
-                new BlockDirt()
+                new BlockSand(),
+                new BlockSand(),
+                new BlockSand(),
+                new BlockStone()
         });
     }
 
