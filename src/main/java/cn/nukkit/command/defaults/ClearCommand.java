@@ -22,5 +22,17 @@ public class ClearCommand extends VanillaCommand {
             sender.sendMessage(new TranslationContainer("commands.generic.usage", this.usageMessage));
             return false;
         }
-      // CODE 
+      
+        CommandSender target = sender;
+        if (args.length > 1) {
+            if (sender.hasPermission("nukkit.command.clear")) {
+                // CODE
+            } else {
+                sender.sendMessage(new TranslationContainer(TextFormat.RED + "%commands.generic.permission"));
+                return true;
+            }
+        } else if (!(sender instanceof Player)) {
+            sender.sendMessage(new TranslationContainer("commands.generic.usage", this.usageMessage));
+            return true;
+        }
 }
