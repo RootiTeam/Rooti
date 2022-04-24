@@ -24,6 +24,7 @@ import cn.nukkit.utils.ServerKiller;
  */
 public class Nukkit {
 
+    public final static String NAME = "Rooti-Nukkit";
     public final static String VERSION = "1.0.1dev";
     public final static String API_VERSION = "1.0.0";
     public final static String CODENAME = "David Ratnikov && Nukkit DevelopTeam";
