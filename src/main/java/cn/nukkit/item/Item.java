@@ -2036,6 +2036,18 @@ public class Item implements Cloneable {
         return false;
     }
 
+    public boolean canBeConsumed() {
+        return false;
+    }
+
+    public boolean canBeConsumedBy(Entity $entity) {
+        return this.canBeConsumed();
+    }
+
+    public void onConsume(Entity $entity) {
+    }
+
+
     @Override
     public final boolean equals(Object item) {
         return item instanceof Item && this.equals((Item) item, true);

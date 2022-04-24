@@ -8,9 +8,7 @@ import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntityHuman;
 import cn.nukkit.entity.data.Skin;
 import cn.nukkit.entity.item.*;
-import cn.nukkit.entity.mob.EntityCreeper;
-import cn.nukkit.entity.mob.EntityZombie;
-import cn.nukkit.entity.mob.EntitySkeleton;
+import cn.nukkit.entity.mob.*;
 import cn.nukkit.entity.passive.*;
 import cn.nukkit.entity.projectile.EntityArrow;
 import cn.nukkit.entity.projectile.EntityEnderPearl;
@@ -87,13 +85,13 @@ public class Server {
 
     private static Server instance = null;
 
-    private BanList banByName = null;
+    private BanList banByName;
 
-    private BanList banByIP = null;
+    private BanList banByIP;
 
-    private Config operators = null;
+    private Config operators;
 
-    private Config whitelist = null;
+    private Config whitelist;
 
     private boolean isRunning = true;
 
@@ -1925,11 +1923,12 @@ public class Server {
         Entity.registerEntity("Snowball", EntitySnowball.class);
         Entity.registerEntity("EnderPearl", EntityEnderPearl.class);
         Entity.registerEntity("Painting", EntityPainting.class);
-        //todo mobs
+        //Monsters
         Entity.registerEntity("Creeper", EntityCreeper.class);
+        Entity.registerEntity("SnowGolem", EntitySnowGolem.class);
         Entity.registerEntity("Skeleton", EntitySkeleton.class);
         Entity.registerEntity("Zombie", EntityZombie.class);
-        //TODO: more mobs
+        //Passive mobs
         Entity.registerEntity("Chicken", EntityChicken.class);
         Entity.registerEntity("Cow", EntityCow.class);
         Entity.registerEntity("Pig", EntityPig.class);
@@ -1948,6 +1947,7 @@ public class Server {
         Entity.registerEntity("MinecartRideable", EntityMinecartEmpty.class);
         // TODO: 2016/1/30 all finds of minecart
         Entity.registerEntity("Boat", EntityBoat.class);
+        Entity.registerEntity("EndCrystal", EntityEndCrystal.class);
 
         //Entity.registerEntity("Lightning", EntityLightning.class); lightning shouldn't be saved as entity
     }

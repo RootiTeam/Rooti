@@ -27,6 +27,7 @@ import cn.nukkit.event.entity.EntityDamageEvent.DamageModifier;
 import cn.nukkit.event.inventory.*;
 import cn.nukkit.event.player.*;
 import cn.nukkit.event.player.PlayerInteractEvent.Action;
+import cn.nukkit.event.player.PlayerJumpEvent;
 import cn.nukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import cn.nukkit.event.server.DataPacketReceiveEvent;
 import cn.nukkit.event.server.DataPacketSendEvent;
@@ -789,6 +790,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         this.sendData(this);
         this.inventory.sendContents(this);
         this.inventory.sendArmorContents(this);
+        this.offhandInventory.sendContents(this);
 
         SetTimePacket setTimePacket = new SetTimePacket();
         setTimePacket.time = this.level.getTime();
@@ -1199,6 +1201,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         this.inventory.sendContents(this);
         this.inventory.sendContents(this.getViewers().values());
         this.inventory.sendHeldItem(this.hasSpawned.values());
+        this.offhandInventory.sendContents(this);
+        this.offhandInventory.sendContents(this.getViewers().values());
 
         return true;
     }
@@ -1226,7 +1230,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
     @Override
     public Item[] getDrops() {
-        if (!this.isCreative()) {
+        if (!this.isCreative() && !this.isSpectator()) {
             return super.getDrops();
         }
 
@@ -1957,6 +1961,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         if (!connected) {
             return;
         }
+
         if (this.getClientId() == -1) {
             this.close(this.getLeaveMessage(), "Incorrect ClientID");
             return;
@@ -2690,6 +2695,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                             respawnPacket.z = (float) respawnPos.z;
                             this.dataPacket(respawnPacket);
 
+                            this.sendExperience();
+                            this.sendExperienceLevel();
                             this.setSprinting(false, true);
                             this.setSneaking(false);
 
@@ -2709,12 +2716,15 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                             this.getAdventureSettings().update();
                             this.inventory.sendContents(this);
                             this.inventory.sendArmorContents(this);
+                            this.offhandInventory.sendContents(this);
 
                             this.spawnToAll();
                             this.scheduleUpdate();
                             break;
 
                         case PlayerActionPacket.ACTION_JUMP:
+                            PlayerJumpEvent playerJumpEvent = new PlayerJumpEvent(this);
+                            this.server.getPluginManager().callEvent(playerJumpEvent);
                             break packetswitch;
 
                         case PlayerActionPacket.ACTION_START_SPRINT:
@@ -4205,6 +4215,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             if (this.inventory != null) {
                 this.inventory.clearAll();
             }
+            if (this.offhandInventory != null) {
+                this.offhandInventory.clearAll();
+            }
         }
 
         if (!ev.getKeepExperience()) {
@@ -4692,22 +4705,27 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     }
 
     public int addWindow(Inventory inventory) {
-        return this.addWindow(inventory, null);
+        return addWindow(inventory, null, false);
     }
 
-    public int addWindow(Inventory inventory, Integer forceId) {
+    public int addWindow(Inventory inventory, Integer forceId, boolean alwaysOpen) {
         if (this.windows.containsKey(inventory)) {
             return this.windows.get(inventory);
         }
         int cnt;
         if (forceId == null) {
             this.windowCnt = cnt = Math.max(2, ++this.windowCnt % 99);
+        } else if (!alwaysOpen) {
+            this.removeWindow(inventory);
+
+            return -1;
         } else {
+            inventory.getViewers().add(this);
             cnt = forceId;
         }
         this.windowIndex.put(cnt, inventory);
         this.windows.put(inventory, cnt);
-        if (inventory.open(this)) {
+        if (this.spawned && inventory.open(this)) {
             return cnt;
         } else {
             this.removeWindow(inventory);
@@ -4826,6 +4844,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
     public void setCheckMovement(boolean checkMovement) {
         this.checkMovement = checkMovement;
+    }
+
+    public boolean isCheckingMovement() {
+        return this.checkMovement;
     }
 
     public synchronized void setLocale(Locale locale) {

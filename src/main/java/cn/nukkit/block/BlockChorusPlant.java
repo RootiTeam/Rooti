@@ -1,12 +1,18 @@
 package cn.nukkit.block;
 
 import cn.nukkit.item.Item;
-import cn.nukkit.item.ItemID;
+import cn.nukkit.utils.ItemID;
 import cn.nukkit.item.ItemTool;
 import cn.nukkit.utils.BlockColor;
+import cn.nukkit.block.Block;
+import cn.nukkit.math.BlockFace;
+import cn.nukkit.Player;
 
 import java.util.concurrent.ThreadLocalRandom;
 
+/**
+  * Created by ddosnikgit on 24.04.2022.
+  */    
 public class BlockChorusPlant extends BlockTransparent {
 
 	public BlockChorusPlant() {
@@ -39,12 +45,23 @@ public class BlockChorusPlant extends BlockTransparent {
 
     @Override
     public int getToolType() {
-    	return ItemTool.TYPE_NONE;
+    	return ItemTool.TYPE_AXE;
     }
 
     @Override
     public Item[] getDrops(Item item) {
-    	return ThreadLocalRandom.current().nextBoolean() ? new Item[]{Item.get(ItemID.CHORUS_FRUIT, 0, 1)} : new Item[0];
+    	return new Item[]{Item.get(ItemID.CHORUS_FRUIT, 0, 1)};
+    }
+
+    @Override
+    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
+        Block down = this.down();
+               if (down.getId() == Block.END_STONE || down.getId() == Block.CHORUS_PLANT || down.getId() == Block.CHORUS_FLOWER || down.getId() == Block.END_BRICKS || down.getId() == Block.AIR) {
+            this.getLevel().setBlock(block, this, true);
+
+            return true;
+        }
+        return false;
     }
 
     @Override

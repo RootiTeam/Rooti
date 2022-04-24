@@ -18,7 +18,8 @@ public enum InventoryType {
     ENCHANT_TABLE(2, "Enchant", 3), //1 INPUT/OUTPUT, 1 LAPIS
     DISPENSER(0, "Dispenser", 6), //9 CONTAINER
     DROPPER(9, "Dropper", 7), //9 CONTAINER
-    HOPPER(5, "Hopper", 8); //5 CONTAINER
+    HOPPER(5, "Hopper", 8), //5 CONTAINER
+    OFFHAND(1, "Offhand", -1);
 
     private final int size;
     private final String title;

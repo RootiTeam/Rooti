@@ -106,7 +106,7 @@ public class EntityHuman extends EntityHumanType {
         super.initEntity();
 
         if (this instanceof Player) {
-            ((Player) this).addWindow(this.inventory, 0);
+            ((Player) this).addWindow(this.inventory, 0, false);
         }
     }
 
@@ -156,6 +156,7 @@ public class EntityHuman extends EntityHumanType {
             player.dataPacket(pk);
 
             this.inventory.sendArmorContents(player);
+            this.offhandInventory.sendContents(player);
 
             if (this.riding != null) {
                 SetEntityLinkPacket pkk = new SetEntityLinkPacket();
