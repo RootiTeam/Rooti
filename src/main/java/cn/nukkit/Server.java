@@ -259,7 +259,7 @@ public class Server {
         this.logger.info("Loading " + TextFormat.GREEN + "server properties" + TextFormat.WHITE + "...");
         this.properties = new Config(this.dataPath + "server.properties", Config.PROPERTIES, new ConfigSection() {
             {
-                put("motd", "Nukkit Server For Minecraft: PE");
+                put("motd", "Rooti Server For Minecraft: PE");
                 put("server-port", 19132);
                 put("server-ip", "0.0.0.0");
                 put("view-distance", 10);
@@ -1117,7 +1117,7 @@ public class Server {
     }
 
     public String getName() {
-        return "Rooti-nukkit";
+        return Nukkit.NAME;
     }
 
     public boolean isRunning() {
