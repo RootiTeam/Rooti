@@ -70,7 +70,8 @@ public class SimpleCommandMap implements CommandMap {
         this.register("nukkit", new XpCommand("xp"));
         this.register("nukkit", new StatusCommand("status"));
         this.register("nukkit", new GarbageCollectorCommand("gc"));
-        this.register("nukkit", new DumpMemoryCommand("dumpmemory"));
+        this.register("nukkit", new ClearCommand("clear"));
+        //this.register("nukkit", new DumpMemoryCommand("dumpmemory"));
     }
 
     @Override
