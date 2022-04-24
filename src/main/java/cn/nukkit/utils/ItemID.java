@@ -1,4 +1,4 @@
-package cn.nukkit.item;
+package cn.nukkit.utils;
 
 public interface ItemID {
     int IRON_SHOVEL = 256;
