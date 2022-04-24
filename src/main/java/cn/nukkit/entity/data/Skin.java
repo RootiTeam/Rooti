@@ -16,7 +16,7 @@ import lombok.ToString;
  * author: MagicDroidX
  * Nukkit Project
  */
-@ToString(exclude = {"skinData", "capeData", "geometryData"})
+@ToString
 public class Skin {
 
     public static final int SINGLE_SKIN_SIZE = 64 * 32 * 4;

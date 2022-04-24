@@ -76,7 +76,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
- * author: MagicDroidX & Box
+ * @author MagicDroidX and Box
  * Nukkit Project
  */
 public class Player extends EntityHuman implements CommandSender, InventoryHolder, ChunkLoader, IPlayer {
@@ -1958,9 +1958,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     }
 
     public void handleDataPacket(DataPacket packet) {
-        if (!connected) {
-            return;
-        }
+        if (!connected) return;
 
         if (this.getClientId() == -1) {
             this.close(this.getLeaveMessage(), "Incorrect ClientID");
