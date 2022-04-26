@@ -6,6 +6,7 @@ import cn.nukkit.raknet.protocol.EncapsulatedPacket;
 import cn.nukkit.raknet.protocol.Packet;
 import cn.nukkit.raknet.protocol.packet.*;
 import cn.nukkit.utils.Binary;
+import cn.nukkit.Server;
 import cn.nukkit.utils.BinaryStream;
 
 import java.io.IOException;
@@ -35,7 +36,7 @@ public class Session {
     private final int port;
     private int state = STATE_UNCONNECTED;
     //private List<EncapsulatedPacket> preJoinQueue = new ArrayList<>();
-    private int mtuSize = 548; //Min size
+    private int mtuSize = (int) Server.getInstance().getRootiConfig("network.min-mtu", 548); //Min size
     private long id = 0;
     private int splitID = 0;
 

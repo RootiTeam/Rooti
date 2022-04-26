@@ -1,0 +1,13 @@
+# ┏━━━┓╋╋╋╋╋┏┓
+# ┃┏━┓┃╋╋╋╋┏┛┗┓
+# ┃┗━┛┣━━┳━┻┓┏╋┓
+# ┃┏┓┏┫┏┓┃┏┓┃┃┣┫
+# ┃┃┃┗┫┗┛┃┗┛┃┗┫┃
+# ┗┛┗━┻━━┻━━┻━┻┛
+# Rooti server configuration file.
+# Some of these settings are safe, others can break your server if you change them incorrectly.
+# New parameters and settings will not be automatically added when updating this file.
+
+network:
+ # The maximum size of a useful data block of one packet.
+ min-mtu: 548

@@ -48,37 +48,37 @@ public class MainLogger extends ThreadedLogger {
 
     @Override
     public void emergency(String message) {
-        this.send(TextFormat.RED + "[EMERGENCY] " + message);
+        this.send("\033[38;5;203m[EMERGENCY]: " + message);
     }
 
     @Override
     public void alert(String message) {
-        this.send(TextFormat.RED + "[ALERT] " + message);
+        this.send("\033[38;5;203m[ALERT]: " + message);
     }
 
     @Override
     public void critical(String message) {
-        this.send(TextFormat.RED + "[CRITICAL] " + message);
+        this.send("\033[38;5;203m[CRITICAL]: " + message);
     }
 
     @Override
     public void error(String message) {
-        this.send(TextFormat.DARK_RED + "[ERROR] " + message);
+        this.send("\033[38;5;124m[ERROR]: " + message);
     }
 
     @Override
     public void warning(String message) {
-        this.send(TextFormat.YELLOW + "[WARNING] " + message);
+        this.send("\033[38;5;227m[WARNING]: " + message);
     }
 
     @Override
     public void notice(String message) {
-        this.send(TextFormat.AQUA + "[NOTICE] " + message);
+        this.send("\033[38;5;87m[NOTICE]: " + message);
     }
 
     @Override
     public void info(String message) {
-        this.send(TextFormat.WHITE + "[INFO] " + message);
+        this.send("\033[38;5;231m[INFO]: " + message);
     }
 
     @Override
@@ -86,7 +86,7 @@ public class MainLogger extends ThreadedLogger {
         if (!this.logDebug) {
             return;
         }
-        this.send(TextFormat.GRAY + "[DEBUG] " + message);
+        this.send("\033[38;5;59m[DEBUG]: " + message);
     }
 
     public void setLogDebug(Boolean logDebug) {
@@ -228,7 +228,7 @@ public class MainLogger extends ThreadedLogger {
         try {
             Writer writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(logFile, true), StandardCharsets.UTF_8), 1024);
             Date now = new Date();
-            String consoleDateFormat = new SimpleDateFormat("HH:mm:ss ").format(now);
+            String consoleDateFormat = new SimpleDateFormat("HH:mm:ss").format(now);
             String fileDateFormat = new SimpleDateFormat("Y-M-d HH:mm:ss ").format(now);
             int count = 0;
             while (!logBuffer.isEmpty()) {
@@ -238,7 +238,7 @@ public class MainLogger extends ThreadedLogger {
                     writer.write(TextFormat.clean(message));
                     writer.write("\r\n");
                     CommandReader.getInstance().stashLine();
-                    System.out.println(colorize(TextFormat.AQUA + consoleDateFormat + TextFormat.RESET + message + TextFormat.RESET));
+                    System.out.println(colorize("\033[38;5;87m["+ consoleDateFormat +"] " + message + TextFormat.RESET));
                     CommandReader.getInstance().unstashLine();
                 }
             }

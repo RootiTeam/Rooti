@@ -175,6 +175,7 @@ public class Server {
 
     private Config properties;
     private Config config;
+    private Config rooticonfig;
 
     private final Map<String, Player> players = new HashMap<>();
 
@@ -241,11 +242,18 @@ public class Server {
                 advacedConf = this.getClass().getClassLoader().getResourceAsStream("lang/" + fallback + "/nukkit.yml");
             }
 
+           InputStream rootiConf = this.getClass().getClassLoader().getResourceAsStream("lang/" + language + "/rooti.yml");
+            if (rootiConf == null) {
+                rootiConf = this.getClass().getClassLoader().getResourceAsStream("lang/" + fallback + "/rooti.yml");
+            }
+
             try {
                 Utils.writeFile(this.dataPath + "nukkit.yml", advacedConf);
+                Utils.writeFile(this.dataPath + "rooti.yml", rootiConf);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
+
 
         }
 
@@ -253,6 +261,9 @@ public class Server {
 
         this.logger.info("Loading " + TextFormat.GREEN + "nukkit.yml" + TextFormat.WHITE + "...");
         this.config = new Config(this.dataPath + "nukkit.yml", Config.YAML);
+
+        this.logger.info("Loading " + TextFormat.GREEN + "rooti.yml" + TextFormat.WHITE + "...");
+        this.rooticonfig = new Config(this.dataPath + "rooti.yml", Config.YAML);
 
         this.logger.info("Loading " + TextFormat.GREEN + "server properties" + TextFormat.WHITE + "...");
         this.properties = new Config(this.dataPath + "server.properties", Config.PROPERTIES, new ConfigSection() {
@@ -1735,6 +1746,19 @@ public class Server {
     //Revising later...
     public Config getConfig() {
         return this.config;
+    }
+
+    public Config getRootiConfig() {
+        return this.rooticonfig;
+    }
+
+    public Object getRootiConfig(String variable) {
+        return this.getRootiConfig(variable, null);
+    }
+
+    public Object getRootiConfig(String variable, Object defaultValue) {
+        Object value = this.rooticonfig.get(variable);
+        return value == null ? defaultValue : value;
     }
 
     public Object getConfig(String variable) {

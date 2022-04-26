@@ -4706,27 +4706,22 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     }
 
     public int addWindow(Inventory inventory) {
-        return addWindow(inventory, null, false);
+        return this.addWindow(inventory, null);
     }
 
-    public int addWindow(Inventory inventory, Integer forceId, boolean alwaysOpen) {
+    public int addWindow(Inventory inventory, Integer forceId) {
         if (this.windows.containsKey(inventory)) {
             return this.windows.get(inventory);
         }
         int cnt;
         if (forceId == null) {
             this.windowCnt = cnt = Math.max(2, ++this.windowCnt % 99);
-        } else if (!alwaysOpen) {
-            this.removeWindow(inventory);
-
-            return -1;
         } else {
-            inventory.getViewers().add(this);
             cnt = forceId;
         }
         this.windowIndex.put(cnt, inventory);
         this.windows.put(inventory, cnt);
-        if (this.spawned && inventory.open(this)) {
+        if (inventory.open(this)) {
             return cnt;
         } else {
             this.removeWindow(inventory);

@@ -213,8 +213,10 @@ public class Network {
 
     private void registerPackets() {
         this.packetPool = new Class[256];
-
+        
+        this.registerPacket(ProtocolInfo.SERVER_TO_CLIENT_HANDSHAKE_PACKET, ServerToClientHandshakePacket.class);
         this.registerPacket(ProtocolInfo.ADD_ENTITY_PACKET, AddEntityPacket.class);
+        this.registerPacket(ProtocolInfo.CAMERA_PACKET, CameraPacket.class);
         this.registerPacket(ProtocolInfo.ADD_HANGING_ENTITY_PACKET, AddHangingEntityPacket.class);
         this.registerPacket(ProtocolInfo.ADD_ITEM_ENTITY_PACKET, AddItemEntityPacket.class);
         this.registerPacket(ProtocolInfo.ADD_ITEM_PACKET, AddItemPacket.class);
