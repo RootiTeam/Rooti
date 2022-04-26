@@ -85,7 +85,7 @@ public class BlockEndPortalFrame extends BlockTransparent {
         if ((this.getDamage() & 0x04) == 0 && player != null && item.getId() == Item.ENDER_EYE) {
             this.setDamage(this.getDamage() + 4);
             this.getLevel().setBlock(this, this, true, true);
-            this.createPortal();
+            //this.createPortal();
             return true;
         }
         return false;
@@ -160,6 +160,14 @@ public class BlockEndPortalFrame extends BlockTransparent {
         return null;
     }
 
+    private boolean checkFrame(Block block) {
+        return block.getId() == this.getId() && (block.getDamage() & 4) == 4;
+    }
+
+    private boolean checkFrame(Block block, int x, int z) {
+        return block.getId() == this.getId() && (block.getDamage() - 4) == (x == -2 ? 3 : x == 2 ? 1 : z == -2 ? 0 : z == 2 ? 2 : -1);
+    }
+    
     @Override
     public boolean canHarvestWithHand() {
         return false;
