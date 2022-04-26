@@ -568,6 +568,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         this.creationTime = System.currentTimeMillis();
     }
 
+    @Override
     public boolean isPlayer() {
         return true;
     }
