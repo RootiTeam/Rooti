@@ -1187,9 +1187,8 @@ public abstract class Block extends Position implements Metadatable, Cloneable {
         }
     }
 
-    @Override
     public Block clone() {
-        Block clone = (Block) super.clone();
+        return (Block) super.clone();
     }
 
     public int getWeakPower(BlockFace face) {
