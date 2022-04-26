@@ -950,10 +950,12 @@ public abstract class Block extends Position implements Metadatable, Cloneable {
         return this.getHardness() != -1;
     }
 
+    @Override
     public Block getSide(BlockFace face) {
         return this.getSide(face, 1);
     }
 
+    @Override
     public Block getSide(BlockFace face, int step) {
         if (this.isValid()) {
             return this.getLevel().getBlock(super.getSide(face, step));
@@ -961,50 +963,62 @@ public abstract class Block extends Position implements Metadatable, Cloneable {
         return Block.get(Item.AIR, 0, Position.fromObject(new Vector3(this.x, this.y, this.z).getSide(face, step)));
     }
 
+    @Override
     public Block up() {
         return up(1);
     }
 
+    @Override
     public Block up(int step) {
         return getSide(BlockFace.UP, step);
     }
 
+    @Override
     public Block down() {
         return down(1);
     }
 
+    @Override
     public Block down(int step) {
         return getSide(BlockFace.DOWN, step);
     }
 
+    @Override
     public Block north() {
         return north(1);
     }
 
+    @Override
     public Block north(int step) {
         return getSide(BlockFace.NORTH, step);
     }
 
+    @Override
     public Block south() {
         return south(1);
     }
 
+    @Override
     public Block south(int step) {
         return getSide(BlockFace.SOUTH, step);
     }
 
+    @Override
     public Block east() {
         return east(1);
     }
 
+    @Override
     public Block east(int step) {
         return getSide(BlockFace.EAST, step);
     }
 
+    @Override
     public Block west() {
         return west(1);
     }
 
+    @Override
     public Block west(int step) {
         return getSide(BlockFace.WEST, step);
     }
@@ -1056,6 +1070,7 @@ public abstract class Block extends Position implements Metadatable, Cloneable {
         return getBoundingBox();
     }
 
+    @Override
     public MovingObjectPosition calculateIntercept(Vector3 pos1, Vector3 pos2) {
         AxisAlignedBB bb = this.getBoundingBox();
         if (bb == null) {
@@ -1172,8 +1187,9 @@ public abstract class Block extends Position implements Metadatable, Cloneable {
         }
     }
 
+    @Override
     public Block clone() {
-        return (Block) super.clone();
+        Block clone = (Block) super.clone();
     }
 
     public int getWeakPower(BlockFace face) {
