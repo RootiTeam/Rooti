@@ -33,6 +33,7 @@ public class BlockCauldron extends BlockSolid {
         return CAULDRON_BLOCK;
     }
 
+    @Override
     public String getName() {
         return "Cauldron Block";
     }
@@ -228,10 +229,12 @@ public class BlockCauldron extends BlockSolid {
         return new ItemCauldron();
     }
 
+    @Override
     public boolean hasComparatorInputOverride() {
         return true;
     }
 
+    @Override
     public int getComparatorInputOverride() {
         return this.meta;
     }
