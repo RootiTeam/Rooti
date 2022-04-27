@@ -6,7 +6,8 @@ import cn.nukkit.item.ItemBlock;
 import cn.nukkit.Player;
 import cn.nukkit.item.Item;
 import cn.nukkit.math.AxisAlignedBB;
-
+import java.util.ArrayList;
+import java.util.List;
 
 public class BlockEndPortalFrame extends BlockTransparent {
 
