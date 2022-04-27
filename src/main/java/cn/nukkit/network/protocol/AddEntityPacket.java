@@ -1,8 +1,11 @@
 package cn.nukkit.network.protocol;
 
 import cn.nukkit.entity.Attribute;
+import cn.nukkit.entity.mob.EntitySkeleton;
+import cn.nukkit.entity.item.EntityFishingHook;
 import cn.nukkit.entity.data.EntityMetadata;
 import cn.nukkit.utils.Binary;
+import com.google.common.collect.ImmutableMap;
 import lombok.ToString;
 /**
  * author: MagicDroidX
@@ -11,6 +14,13 @@ import lombok.ToString;
 @ToString
 public class AddEntityPacket extends DataPacket {
     public static final byte NETWORK_ID = ProtocolInfo.ADD_ENTITY_PACKET;
+
+    public static ImmutableMap<Integer, String> LEGACY_IDS = ImmutableMap.<Integer, String>builder()
+            .put(51, "minecraft:npc")
+            .put(63, "minecraft:player")
+            .put(EntityFishingHook.NETWORK_ID, "minecraft:fishing_hook")
+            .put(EntitySkeleton.NETWORK_ID, "minecraft:skeleton")
+            .build();
 
     @Override
     public byte pid() {

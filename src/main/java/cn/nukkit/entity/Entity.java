@@ -434,6 +434,35 @@ public abstract class Entity extends Location implements Metadatable {
         return this.getDataFlag(DATA_FLAGS, DATA_FLAG_CAN_SHOW_NAMETAG);
     }
 
+   public static CompoundTag getDefaultNBT(Vector3 pos) {
+        return getDefaultNBT(pos, null);
+    }
+
+    public static CompoundTag getDefaultNBT(Vector3 pos, Vector3 motion) {
+        Location loc = pos instanceof Location ? (Location) pos : null;
+
+        if (loc != null) {
+            return getDefaultNBT(pos, motion, (float) loc.getYaw(), (float) loc.getPitch());
+        }
+
+        return getDefaultNBT(pos, motion, 0, 0);
+    }
+
+    public static CompoundTag getDefaultNBT(Vector3 pos, Vector3 motion, float yaw, float pitch) {
+        return new CompoundTag()
+                .putList(new ListTag<DoubleTag>("Pos")
+                        .add(new DoubleTag("", pos.x))
+                        .add(new DoubleTag("", pos.y))
+                        .add(new DoubleTag("", pos.z)))
+                .putList(new ListTag<DoubleTag>("Motion")
+                        .add(new DoubleTag("", motion != null ? motion.x : 0))
+                        .add(new DoubleTag("", motion != null ? motion.y : 0))
+                        .add(new DoubleTag("", motion != null ? motion.z : 0)))
+                .putList(new ListTag<FloatTag>("Rotation")
+                        .add(new FloatTag("", yaw))
+                        .add(new FloatTag("", pitch)));
+    }
+
     public boolean isNameTagAlwaysVisible() {
         return this.getDataFlag(DATA_FLAGS, DATA_FLAG_ALWAYS_SHOW_NAMETAG);
     }

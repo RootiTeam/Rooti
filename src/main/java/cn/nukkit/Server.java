@@ -10,9 +10,7 @@ import cn.nukkit.entity.data.Skin;
 import cn.nukkit.entity.item.*;
 import cn.nukkit.entity.mob.*;
 import cn.nukkit.entity.passive.*;
-import cn.nukkit.entity.projectile.EntityArrow;
-import cn.nukkit.entity.projectile.EntityEnderPearl;
-import cn.nukkit.entity.projectile.EntitySnowball;
+import cn.nukkit.entity.projectile.*;
 import cn.nukkit.event.HandlerList;
 import cn.nukkit.event.level.LevelInitEvent;
 import cn.nukkit.event.level.LevelLoadEvent;
@@ -1972,6 +1970,7 @@ public class Server {
         // TODO: 2016/1/30 all finds of minecart
         Entity.registerEntity("Boat", EntityBoat.class);
         Entity.registerEntity("EndCrystal", EntityEndCrystal.class);
+        Entity.registerEntity("FishingHook", EntityFishingHook.class);
 
         //Entity.registerEntity("Lightning", EntityLightning.class); lightning shouldn't be saved as entity
     }
