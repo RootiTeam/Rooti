@@ -11,7 +11,7 @@ import cn.nukkit.utils.TextFormat;
 public class ClearCommand extends VanillaCommand {
 
     public ClearCommand(String name) {
-        super(name, "Clear your inventory", "/clear",
+        super(name, "%nukkit.command.clear.description", "/clear",
                 new String[]{"clear"});
         this.setPermission("nukkit.command.clear;");
     }
@@ -25,7 +25,7 @@ public class ClearCommand extends VanillaCommand {
              if (sender.hasPermission("nukkit.command.clear")) {
                 CommandSender target = sender;
                 ((Player) target).getInventory().clearAll();
-                sender.sendMessage("Inventory cleared.");
+                sender.sendMessage("%nukkit.command.clear.success");
             } else {
                 sender.sendMessage(new TranslationContainer(TextFormat.RED + "%commands.generic.permission"));
                 return true;
