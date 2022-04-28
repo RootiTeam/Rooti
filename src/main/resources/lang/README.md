@@ -1,6 +1,7 @@
-#Multi-Language configurations for Nukkit
+#Multi-Language configurations for Rooti
 
 We need you!
 -------------
 
-We always welcome your contribution to a multi-language Nukkit!
+We always welcome your contribution to a multi-language Rooti!
+Available languages: rus (Russia), eng (England), cht (China)
