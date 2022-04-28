@@ -25,7 +25,7 @@ public class ClearCommand extends VanillaCommand {
              if (sender.hasPermission("nukkit.command.clear")) {
                 CommandSender target = sender;
                 ((Player) target).getInventory().clearAll();
-                sender.sendMessage("%nukkit.command.clear.success");
+                sender.sendMessage(new TranslationContainer(TextFormat.GREEN + "%nukkit.command.clear.success");
             } else {
                 sender.sendMessage(new TranslationContainer(TextFormat.RED + "%commands.generic.permission"));
                 return true;
