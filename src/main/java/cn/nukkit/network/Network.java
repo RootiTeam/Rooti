@@ -48,8 +48,8 @@ public class Network {
     }
 
     public void addStatistics(double upload, double download) {
-        this.upload += upload;
-        this.download += download;
+        this.upload = upload;
+        this.download = download;
     }
 
     public double getUpload() {
