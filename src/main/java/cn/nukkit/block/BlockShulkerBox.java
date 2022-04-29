@@ -16,6 +16,8 @@ import java.util.*;
 
 public class BlockShulkerBox extends BlockTransparent {
 
+    public static int facing;
+
     public BlockShulkerBox() {
         this(0);
     }
@@ -51,9 +53,11 @@ public class BlockShulkerBox extends BlockTransparent {
 
     @Override
     public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
+        this.facing = face.getIndex();
         this.getLevel().setBlock(block, this, true, true);
         CompoundTag nbt = new CompoundTag("")
                 .putString("id", BlockEntity.SHULKER_BOX)
+                .putByte("facing", this.facing)
                 .putInt("x", (int) this.x)
                 .putInt("y", (int) this.y)
                 .putInt("z", (int) this.z);
