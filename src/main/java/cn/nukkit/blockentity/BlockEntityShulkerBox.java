@@ -2,6 +2,7 @@ package cn.nukkit.blockentity;
 
 import cn.nukkit.Player;
 import cn.nukkit.block.Block;
+import cn.nukkit.block.BlockShulkerBox;
 import cn.nukkit.block.BlockAir;
 import cn.nukkit.inventory.InventoryHolder;
 import cn.nukkit.inventory.ShulkerBoxInventory;
@@ -132,6 +133,7 @@ public class BlockEntityShulkerBox extends BlockEntitySpawnable implements Inven
     public CompoundTag getSpawnCompound() {
         CompoundTag nbt = new CompoundTag()
                 .putString("id", BlockEntity.SHULKER_BOX)
+                .putByte("facing", BlockShulkerBox.facing)
                 .putInt("x", (int) this.x)
                 .putInt("y", (int) this.y)
                 .putInt("z", (int) this.z);
