@@ -4,6 +4,7 @@ import cn.nukkit.Player;
 import cn.nukkit.blockentity.BlockEntityShulkerBox;
 import cn.nukkit.level.Level;
 import cn.nukkit.network.protocol.BlockEventPacket;
+import cn.nukkit.network.protocol.LevelSoundEventPacket;
 
 public class ShulkerBoxInventory extends ContainerInventory {
 
@@ -30,6 +31,7 @@ public class ShulkerBoxInventory extends ContainerInventory {
 
             Level level = this.getHolder().getLevel();
             if (level != null) {
+                level.addLevelSoundEvent(LevelSoundEventPacket.SOUND_SHULKERBOX_OPEN, 1, -1, this.getHolder().add(0.5, 0.5, 0.5), false, false);
                 level.addChunkPacket((int) this.getHolder().getX() >> 4, (int) this.getHolder().getZ() >> 4, pk);
             }
         }
@@ -47,6 +49,7 @@ public class ShulkerBoxInventory extends ContainerInventory {
 
             Level level = this.getHolder().getLevel();
             if (level != null) {
+                level.addLevelSoundEvent(LevelSoundEventPacket.SOUND_SHULKERBOX_CLOSED, 1, -1, this.getHolder().add(0.5, 0.5, 0.5), false, false);
                 level.addChunkPacket((int) this.getHolder().getX() >> 4, (int) this.getHolder().getZ() >> 4, pk);
             }
         }

@@ -11,3 +11,5 @@
 network:
  # The maximum size of a useful data block of one packet.
  min-mtu: 548
+ # The maximum number of packets per second.
+ max-pps: 150

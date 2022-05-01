@@ -78,9 +78,6 @@ public class Nukkit {
         // Parse arguments
         OptionSet options = parser.parse(args);
 
-        ANSI = options.has(disableAnsi);
-        TITLE = options.has(enableTitle);
-
         Object verbosity = options.valueOf("v");
         if (verbosity == null) {
             verbosity = options.valueOf("-verbosity");

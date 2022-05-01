@@ -46,4 +46,11 @@ public class NukkitMath {
         return ((double) Math.round(d * Math.pow(10, precision))) / Math.pow(10, precision);
     }
 
+    public static double getDirection(double diffX, double diffZ) {
+        diffX = Math.abs(diffX);
+        diffZ = Math.abs(diffZ);
+
+        return Math.max(diffX, diffZ);
+    }
+
 }

@@ -59,6 +59,7 @@ import cn.nukkit.plugin.Plugin;
 import cn.nukkit.potion.Effect;
 import cn.nukkit.potion.Potion;
 import cn.nukkit.resourcepacks.ResourcePack;
+import cn.nukkit.utils.Utils;
 import cn.nukkit.utils.Binary;
 import cn.nukkit.utils.ClientChainData;
 import cn.nukkit.utils.TextFormat;
@@ -181,6 +182,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
     protected int inAirTicks = 0;
     protected int startAirTicks = 5;
+
+    private final int maxPacketsPerSecond = (int) Server.getInstance().getRootiConfig("network.max-pps", 150);
 
     protected AdventureSettings adventureSettings;
 
@@ -1425,12 +1428,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             return;
         }
         Vector3 newPos = this.newPosition;
-        Vector3 oldPos = this.getLocation();
-        double distanceSquaredold = newPos.distanceSquared(this);
-        double distanceSquared = newPos.distanceSquared(oldPos);
+        double distanceSquared = newPos.distanceSquared(this);
         boolean revert = false;
-          if (distanceSquared > 100 || (distanceSquared / ((double) (tickDiff * tickDiff))) > 100 && (newPos.y - this.y) > -5) {
-            this.server.getLogger().debug(this.getName() + " moved to very fast, reverting movement.");
+        if ((distanceSquared / ((double) (tickDiff * tickDiff))) > 100 && (newPos.y - this.y) > -5) {
             revert = true;
         } else {
             if (this.chunk == null || !this.chunk.isGenerated()) {
@@ -1457,6 +1457,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             double dz = newPos.z - this.z;
 
             this.fastMove(dx, dy, dz);
+            if (this.newPosition == null) {
+                return; //maybe solve that in better way
+            }
 
             double diffX = this.x - newPos.x;
             double diffY = this.y - newPos.y;
@@ -1468,10 +1471,12 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             }
 
             if (diffX != 0 || diffY != 0 || diffZ != 0) {
-                if (this.checkMovement && !server.getAllowFlight() && this.isSurvival()) {
-                    if (!this.isSleeping()) {
+                if (this.checkMovement && !server.getAllowFlight() && (this.isSurvival() || this.isAdventure())) {
+                    // Some say: I cant move my head when riding because the server
+                    // blocked my movement
+                    if (!this.isSleeping() && this.riding == null && !this.hasEffect(Effect.LEVITATION)) {
                         double diffHorizontalSqr = (diffX * diffX + diffZ * diffZ) / ((double) (tickDiff * tickDiff));
-                        if (diffHorizontalSqr > 0.0625 && this.isSurvival()) {
+                        if (diffHorizontalSqr > 0.5) {
                             PlayerInvalidMoveEvent ev;
                             this.getServer().getPluginManager().callEvent(ev = new PlayerInvalidMoveEvent(this, true));
                             if (!ev.isCancelled()) {
@@ -1532,17 +1537,16 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     if (!to.equals(ev.getTo())) { //If plugins modify the destination
                         this.teleport(ev.getTo(), null);
                     } else {
-                        this.sendPosition(new Vector3(this.x, this.y, this.z), this.yaw, this.pitch, MovePlayerPacket.MODE_NORMAL, this.getViewers().values().toArray(new Player[0]));
+                        this.addMovement(this.x, this.y, this.z, this.yaw, this.pitch, this.yaw);
                     }
+                    //Biome biome = Biome.biomes[level.getBiomeId(this.getFloorX(), this.getFloorZ())];
+                    //sendTip(biome.getName() + " (" + biome.doesOverhang() + " " + biome.getBaseHeight() + "-" + biome.getHeightVariation() + ")");
                 } else {
                     this.blocksAround = blocksAround;
                     this.collisionBlocks = collidingBlocks;
                 }
             }
 
-            if (!this.isSpectator()) {
-                this.checkNearEntities();
-            }
             if (this.speed == null) speed = new Vector3(from.x - to.x, from.y - to.y, from.z - to.z);
             else this.speed.setComponents(from.x - to.x, from.y - to.y, from.z - to.z);
         } else {
@@ -1562,7 +1566,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         if (this.inAirTicks == 3 && swimming == 0) {
                             jump = 0.7;
                         }
-                        this.getFoodData().updateFoodExpLevel(0.1 * distance + jump + swimming);
+                        this.getFoodData().updateFoodExpLevel(0.06 * distance + jump + swimming);
                     } else {
                         if (this.inAirTicks == 3 && swimming == 0) {
                             jump = 0.2;
@@ -1582,9 +1586,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             this.lastYaw = from.yaw;
             this.lastPitch = from.pitch;
 
-            this.sendPosition(from, from.yaw, from.pitch, MovePlayerPacket.MODE_RESET);
+            // We have to send slightly above otherwise the player will fall into the ground.
+            this.sendPosition(from.add(0, 0.00001, 0), from.yaw, from.pitch, MovePlayerPacket.MODE_RESET);
             //this.sendSettings();
-            this.forceMovement = new Vector3(from.x, from.y, from.z);
+            this.forceMovement = new Vector3(from.x, from.y + 0.00001, from.z);
         } else {
             this.forceMovement = null;
             if (distanceSquared != 0 && this.nextChunkOrderRun > 20) {
@@ -1689,7 +1694,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         double expectedVelocity = (-this.getGravity()) / ((double) this.getDrag()) - ((-this.getGravity()) / ((double) this.getDrag())) * Math.exp(-((double) this.getDrag()) * ((double) (this.inAirTicks - this.startAirTicks)));
                         double diff = (this.speed.y - expectedVelocity) * (this.speed.y - expectedVelocity);
 
-                        if (!this.hasEffect(Effect.JUMP) && diff > 0.6 && expectedVelocity < this.speed.y) {
+                        if (!this.hasEffect(Effect.JUMP) && !this.hasEffect(Effect.LEVITATION) && diff > 0.6 && expectedVelocity < this.speed.y) {
                             if (this.inAirTicks < 100) {
                                 //this.sendSettings();
                                 this.setMotion(new Vector3(0, expectedVelocity, 0));
@@ -1972,19 +1977,14 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         this.server.onPlayerLogin(this);
     }
 
-    public static Date getNowTime() {
-        Date now = new Date();
-        return now;
-    }
-
     public boolean isFlooding(String address, int port) {
         if (!address.isEmpty()) {
             if (!this.handleQueuePackets.containsKey(address)) {
                 this.handleQueuePackets.put(address, 0);
-                this.handleQueueTime.put(address, this.getNowTime());
+                this.handleQueueTime.put(address, Utils.getNowTime());
             }
 
-            int result = this.getNowTime().compareTo(this.handleQueueTime.get(address));
+            int result = Utils.getNowTime().compareTo(this.handleQueueTime.get(address));
 
             if (result > 0) {
                 this.handleQueueTime.remove(address);
@@ -1997,9 +1997,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 this.handleQueuePackets.put(address, this.handleQueuePackets.get(address) + 1);
             }
 
-            if (this.handleQueuePackets.get(address) > 100) {
+            if (this.handleQueuePackets.get(address) > maxPacketsPerSecond) {
             this.isFloodingPackets = true;
-            this.getServer().getLogger().warning("Flood detected from " + address);
+            this.getServer().getLogger().warning(this.getName() + " [" + address + "/" + port + "] send a lot of batch packets.");
             this.handleQueueTime.remove(address);
             this.handleQueuePackets.remove(address);
             return true;
@@ -4067,7 +4067,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             this.spawnPosition = null;
 
             if (this.riding instanceof EntityVehicle) {
-                ((EntityVehicle) this.riding).linkedEntity = null;
+                this.riding.linkedEntity = null;
             }
 
             this.riding = null;

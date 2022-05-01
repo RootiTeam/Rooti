@@ -7,6 +7,7 @@ import java.lang.management.ThreadInfo;
 import java.nio.channels.FileChannel;
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
+import java.util.Date;
 
 /**
  * author: MagicDroidX
@@ -122,6 +123,11 @@ public class Utils {
         PrintWriter printWriter = new PrintWriter(stringWriter);
         e.printStackTrace(printWriter);
         return stringWriter.toString();
+    }
+
+    public static Date getNowTime() {
+        Date now = new Date();
+        return now;
     }
 
     public static UUID dataToUUID(String... params) {

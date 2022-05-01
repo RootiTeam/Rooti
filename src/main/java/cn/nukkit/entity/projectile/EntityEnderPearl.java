@@ -9,6 +9,7 @@ import cn.nukkit.math.NukkitMath;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.AddEntityPacket;
+import cn.nukkit.level.particle.PortalParticle;
 
 public class EntityEnderPearl extends EntityProjectile {
     public static final int NETWORK_ID = 87;
@@ -65,6 +66,7 @@ public class EntityEnderPearl extends EntityProjectile {
             this.shootingEntity.teleport(new Vector3(NukkitMath.floorDouble(this.x) + 0.5, this.y, NukkitMath.floorDouble(this.z) + 0.5), TeleportCause.ENDER_PEARL);
             if ((((Player) this.shootingEntity).getGamemode() & 0x01) == 0) this.shootingEntity.attack(5);
             this.level.addSound(new EndermanTeleportSound(this));
+            this.level.addParticle(new PortalParticle(this));
         }
 
         if (this.age > 1200 || this.isCollided) {
