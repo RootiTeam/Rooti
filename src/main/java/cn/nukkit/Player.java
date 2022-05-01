@@ -1423,14 +1423,15 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         }
     }
 
-    protected void processMovement(int tickDiff) {
+  protected void processMovement(int tickDiff) {
         if (!this.isAlive() || !this.spawned || this.newPosition == null || this.teleportPosition != null || this.isSleeping()) {
             return;
         }
         Vector3 newPos = this.newPosition;
         double distanceSquared = newPos.distanceSquared(this);
         boolean revert = false;
-        if ((distanceSquared / ((double) (tickDiff * tickDiff))) > 100 && (newPos.y - this.y) > -5) {
+          if ((distanceSquared / ((double) (tickDiff * tickDiff))) > 100 && (newPos.y - this.y) > -5) {
+            this.server.getLogger().debug(this.getName() + " moved to very fast, reverting movement.");
             revert = true;
         } else {
             if (this.chunk == null || !this.chunk.isGenerated()) {
@@ -1446,42 +1447,33 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 }
             }
         }
-
         double tdx = newPos.x - this.x;
         double tdz = newPos.z - this.z;
         double distance = Math.sqrt(tdx * tdx + tdz * tdz);
-
         if (!revert && distanceSquared != 0) {
             double dx = newPos.x - this.x;
             double dy = newPos.y - this.y;
             double dz = newPos.z - this.z;
 
             this.fastMove(dx, dy, dz);
-            if (this.newPosition == null) {
-                return; //maybe solve that in better way
-            }
 
             double diffX = this.x - newPos.x;
             double diffY = this.y - newPos.y;
             double diffZ = this.z - newPos.z;
-
             double yS = 0.5 + this.ySize;
             if (diffY >= -yS || diffY <= yS) {
                 diffY = 0;
             }
 
             if (diffX != 0 || diffY != 0 || diffZ != 0) {
-                if (this.checkMovement && !server.getAllowFlight() && (this.isSurvival() || this.isAdventure())) {
-                    // Some say: I cant move my head when riding because the server
-                    // blocked my movement
-                    if (!this.isSleeping() && this.riding == null && !this.hasEffect(Effect.LEVITATION)) {
+                if (this.checkMovement && !server.getAllowFlight() && this.isSurvival()) {
+                    if (!this.isSleeping()) {
                         double diffHorizontalSqr = (diffX * diffX + diffZ * diffZ) / ((double) (tickDiff * tickDiff));
-                        if (diffHorizontalSqr > 0.5) {
+                        if (diffHorizontalSqr > 0.5 && this.isSurvival()) {
                             PlayerInvalidMoveEvent ev;
                             this.getServer().getPluginManager().callEvent(ev = new PlayerInvalidMoveEvent(this, true));
                             if (!ev.isCancelled()) {
                                 revert = ev.isRevert();
-
                                 if (revert) {
                                     this.server.getLogger().debug(this.getServer().getLanguage().translateString("nukkit.player.invalidMove", this.getName()));
                                 }
@@ -1489,8 +1481,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         }
                     }
                 }
-
-
                 this.x = newPos.x;
                 this.y = newPos.y;
                 this.z = newPos.z;
@@ -1498,7 +1488,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 this.boundingBox.setBounds(this.x - radius, this.y, this.z - radius, this.x + radius, this.y + this.getHeight(), this.z + radius);
             }
         }
-
         Location from = new Location(
                 this.lastX,
                 this.lastY,
@@ -1507,56 +1496,46 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 this.lastPitch,
                 this.level);
         Location to = this.getLocation();
-
         double delta = Math.pow(this.lastX - to.x, 2) + Math.pow(this.lastY - to.y, 2) + Math.pow(this.z - to.z, 2);
         double deltaAngle = Math.abs(this.lastYaw - to.yaw) + Math.abs(this.lastPitch - to.pitch);
-
         if (!revert && (delta > 0.0001d || deltaAngle > 1d)) {
             boolean isFirst = this.firstMove;
-
             this.firstMove = false;
             this.lastX = to.x;
             this.lastY = to.y;
             this.lastZ = to.z;
-
             this.lastYaw = to.yaw;
             this.lastPitch = to.pitch;
-
             if (!isFirst) {
                 List<Block> blocksAround = new ArrayList<>(this.blocksAround);
                 List<Block> collidingBlocks = new ArrayList<>(this.collisionBlocks);
-
                 PlayerMoveEvent ev = new PlayerMoveEvent(this, from, to);
-
                 this.blocksAround = null;
                 this.collisionBlocks = null;
-
                 this.server.getPluginManager().callEvent(ev);
-
                 if (!(revert = ev.isCancelled())) { //Yes, this is intended
                     if (!to.equals(ev.getTo())) { //If plugins modify the destination
                         this.teleport(ev.getTo(), null);
                     } else {
-                        this.addMovement(this.x, this.y, this.z, this.yaw, this.pitch, this.yaw);
+                        this.sendPosition(new Vector3(this.x, this.y, this.z), this.yaw, this.pitch, MovePlayerPacket.MODE_NORMAL, this.getViewers().values().toArray(new Player[0]));
                     }
-                    //Biome biome = Biome.biomes[level.getBiomeId(this.getFloorX(), this.getFloorZ())];
-                    //sendTip(biome.getName() + " (" + biome.doesOverhang() + " " + biome.getBaseHeight() + "-" + biome.getHeightVariation() + ")");
                 } else {
                     this.blocksAround = blocksAround;
                     this.collisionBlocks = collidingBlocks;
                 }
             }
 
+            if (!this.isSpectator()) {
+                this.checkNearEntities();
+            }
             if (this.speed == null) speed = new Vector3(from.x - to.x, from.y - to.y, from.z - to.z);
             else this.speed.setComponents(from.x - to.x, from.y - to.y, from.z - to.z);
         } else {
             if (this.speed == null) speed = new Vector3(0, 0, 0);
             else this.speed.setComponents(0, 0, 0);
         }
-
         if (!revert && (this.isFoodEnabled() || this.getServer().getDifficulty() == 0)) {
             if ((this.isSurvival() || this.isAdventure())/* && !this.getRiddingOn() instanceof Entity*/) {
-
                 //UpdateFoodExpLevel
                 if (distance >= 0.05) {
                     double jump = 0;
@@ -1566,7 +1545,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         if (this.inAirTicks == 3 && swimming == 0) {
                             jump = 0.7;
                         }
-                        this.getFoodData().updateFoodExpLevel(0.06 * distance + jump + swimming);
+                        this.getFoodData().updateFoodExpLevel(0.1 * distance + jump + swimming);
                     } else {
                         if (this.inAirTicks == 3 && swimming == 0) {
                             jump = 0.2;
@@ -1576,29 +1555,24 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 }
             }
         }
-
         if (revert) {
-
             this.lastX = from.x;
             this.lastY = from.y;
             this.lastZ = from.z;
-
             this.lastYaw = from.yaw;
             this.lastPitch = from.pitch;
 
-            // We have to send slightly above otherwise the player will fall into the ground.
-            this.sendPosition(from.add(0, 0.00001, 0), from.yaw, from.pitch, MovePlayerPacket.MODE_RESET);
+            this.sendPosition(from, from.yaw, from.pitch, MovePlayerPacket.MODE_RESET);
             //this.sendSettings();
-            this.forceMovement = new Vector3(from.x, from.y + 0.00001, from.z);
+            this.forceMovement = new Vector3(from.x, from.y, from.z);
         } else {
             this.forceMovement = null;
             if (distanceSquared != 0 && this.nextChunkOrderRun > 20) {
                 this.nextChunkOrderRun = 20;
             }
         }
-
         this.newPosition = null;
-    }
+}
 
     @Override
     public boolean setMotion(Vector3 motion) {
