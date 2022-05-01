@@ -5,6 +5,7 @@ import cn.nukkit.blockentity.BlockEntityChest;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.Level;
 import cn.nukkit.network.protocol.BlockEventPacket;
+import cn.nukkit.network.protocol.LevelSoundEventPacket;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -105,6 +106,8 @@ public class DoubleChestInventory extends ContainerInventory implements Inventor
     @Override
     public void onOpen(Player who) {
         super.onOpen(who);
+        this.left.viewers.add(who);
+        this.right.viewers.add(who);
 
         if (this.getViewers().size() == 1) {
             BlockEventPacket pk1 = new BlockEventPacket();
@@ -115,6 +118,7 @@ public class DoubleChestInventory extends ContainerInventory implements Inventor
             pk1.case2 = 2;
             Level level = this.left.getHolder().getLevel();
             if (level != null) {
+                level.addLevelSoundEvent(LevelSoundEventPacket.SOUND_CHEST_OPEN, 1, -1, this.left.getHolder().add(0.5, 0.5, 0.5), false, false);
                 level.addChunkPacket((int) this.left.getHolder().getX() >> 4, (int) this.left.getHolder().getZ() >> 4, pk1);
             }
 
@@ -127,6 +131,7 @@ public class DoubleChestInventory extends ContainerInventory implements Inventor
 
             level = this.right.getHolder().getLevel();
             if (level != null) {
+                level.addLevelSoundEvent(LevelSoundEventPacket.SOUND_CHEST_OPEN, 1, -1, this.right.getHolder().add(0.5, 0.5, 0.5), false, false);
                 level.addChunkPacket((int) this.right.getHolder().getX() >> 4, (int) this.right.getHolder().getZ() >> 4, pk2);
             }
         }
@@ -144,6 +149,7 @@ public class DoubleChestInventory extends ContainerInventory implements Inventor
 
             Level level = this.right.getHolder().getLevel();
             if (level != null) {
+                level.addLevelSoundEvent(LevelSoundEventPacket.SOUND_CHEST_CLOSED, 1, -1, this.left.getHolder().add(0.5, 0.5, 0.5), false, false);
                 level.addChunkPacket((int) this.right.getHolder().getX() >> 4, (int) this.right.getHolder().getZ() >> 4, pk1);
             }
 
@@ -156,6 +162,7 @@ public class DoubleChestInventory extends ContainerInventory implements Inventor
 
             level = this.left.getHolder().getLevel();
             if (level != null) {
+                level.addLevelSoundEvent(LevelSoundEventPacket.SOUND_CHEST_CLOSED, 1, -1, this.right.getHolder().add(0.5, 0.5, 0.5), false, false);
                 level.addChunkPacket((int) this.left.getHolder().getX() >> 4, (int) this.left.getHolder().getZ() >> 4, pk2);
             }
         }

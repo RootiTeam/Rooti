@@ -149,6 +149,11 @@ public class BlockFlowerPot extends BlockFlowable {
     }
 
     @Override
+    public Item toItem() {
+        return new ItemFlowerPot();
+    }
+
+    @Override
     protected AxisAlignedBB recalculateBoundingBox() {
         return new AxisAlignedBB(this.x + 0.3125, this.y, this.z + 0.3125, this.x + 0.6875, this.y + 0.375, this.z + 0.6875);
     }

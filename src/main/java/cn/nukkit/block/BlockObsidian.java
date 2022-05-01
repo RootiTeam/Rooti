@@ -15,7 +15,7 @@ public class BlockObsidian extends BlockSolid {
     }
 
     public BlockObsidian(int meta) {
-        super(0);
+        super(meta);
     }
 
     @Override

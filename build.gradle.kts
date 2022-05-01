@@ -13,6 +13,13 @@ version = "1.0-SNAPSHOT"
 
 dependencies {
     implementation("jline:jline:2.14.6")
+    implementation("net.sf.jopt-simple:jopt-simple:5.0.4")
+    implementation("net.minecrell:terminalconsoleappender:1.1.1")
+    implementation("org.jline:jline-reader:3.21.0")
+    implementation("org.jline:jline-terminal-jna:3.21.0")
+    implementation("org.jline:jline-terminal:3.21.0")
+    implementation("org.apache.logging.log4j:log4j-api:2.17.2")
+    implementation("org.apache.logging.log4j:log4j-core:2.17.2")
     implementation("com.google.guava:guava:31.1-jre")
     implementation("com.google.code.gson:gson:2.9.0")
     implementation("org.yaml:snakeyaml:1.30")
@@ -34,6 +41,7 @@ tasks {
     build { dependsOn(shadowJar) }
     shadowJar {
         archiveFileName.set("Rooti.jar")
+        transform(com.github.jengelman.gradle.plugins.shadow.transformers.Log4j2PluginsCacheFileTransformer::class.java)
 
         manifest {
             attributes["Main-Class"] = "cn.nukkit.Nukkit"

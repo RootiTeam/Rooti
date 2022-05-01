@@ -5,7 +5,7 @@ import cn.nukkit.raknet.protocol.EncapsulatedPacket;
 import cn.nukkit.raknet.protocol.Packet;
 import cn.nukkit.raknet.protocol.packet.*;
 import cn.nukkit.utils.Binary;
-import cn.nukkit.utils.ThreadedLogger;
+import cn.nukkit.utils.MainLogger;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.socket.DatagramPacket;
 
@@ -62,7 +62,7 @@ public class SessionManager {
         return this.server.port;
     }
 
-    public ThreadedLogger getLogger() {
+    public MainLogger getLogger() {
         return this.server.getLogger();
     }
 

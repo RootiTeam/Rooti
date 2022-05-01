@@ -1,7 +1,9 @@
 package cn.nukkit.raknet.server;
 
 import cn.nukkit.Server;
-import cn.nukkit.utils.ThreadedLogger;
+import cn.nukkit.utils.MainLogger;
+
+import lombok.extern.log4j.Log4j2;
 
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -9,11 +11,10 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  * author: MagicDroidX
  * Nukkit Project
  */
+@Log4j2
 public class RakNetServer extends Thread {
     protected final int port;
     protected String interfaz;
-
-    protected ThreadedLogger logger;
 
     protected ConcurrentLinkedQueue<byte[]> externalQueue;
     protected ConcurrentLinkedQueue<byte[]> internalQueue;
@@ -21,18 +22,17 @@ public class RakNetServer extends Thread {
     protected boolean shutdown;
 
 
-    public RakNetServer(ThreadedLogger logger, int port) {
-        this(logger, port, "0.0.0.0");
+    public RakNetServer(int port) {
+        this(port, "0.0.0.0");
     }
 
-    public RakNetServer(ThreadedLogger logger, int port, String interfaz) {
+    public RakNetServer(int port, String interfaz) {
         this.port = port;
         if (port < 1 || port > 65536) {
             throw new IllegalArgumentException("Invalid port range");
         }
 
         this.interfaz = interfaz;
-        this.logger = logger;
 
         this.externalQueue = new ConcurrentLinkedQueue<>();
         this.internalQueue = new ConcurrentLinkedQueue<>();
@@ -56,8 +56,8 @@ public class RakNetServer extends Thread {
         return interfaz;
     }
 
-    public ThreadedLogger getLogger() {
-        return logger;
+    public MainLogger getLogger() {
+        return MainLogger.getLogger();
     }
 
     public ConcurrentLinkedQueue<byte[]> getExternalQueue() {
@@ -87,7 +87,7 @@ public class RakNetServer extends Thread {
     private class ShutdownHandler extends Thread {
         public void run() {
             if (!shutdown) {
-                logger.emergency("RakNet crashed!");
+                log.fatal("RakNet crashed!");
             }
         }
     }

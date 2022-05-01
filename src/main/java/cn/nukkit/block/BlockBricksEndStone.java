@@ -10,7 +10,7 @@ public class BlockBricksEndStone extends BlockSolid {
     }
 
     public BlockBricksEndStone(int meta) {
-        super(0);
+        super(meta);
     }
 
     @Override

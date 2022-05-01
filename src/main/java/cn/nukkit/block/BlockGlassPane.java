@@ -14,7 +14,7 @@ public class BlockGlassPane extends BlockThin {
     }
 
     public BlockGlassPane(int meta) {
-        super(0);
+        super(meta);
     }
 
 

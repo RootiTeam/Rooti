@@ -15,6 +15,8 @@ public class TakeItemEntityPacket extends DataPacket {
 
     @Override
     public void decode() {
+        this.target = this.getVarLong();
+        this.entityId = this.getVarLong();
     }
 
     @Override

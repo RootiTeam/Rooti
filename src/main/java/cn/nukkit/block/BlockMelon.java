@@ -4,8 +4,9 @@ import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemMelon;
 import cn.nukkit.item.ItemTool;
 import cn.nukkit.utils.BlockColor;
+import cn.nukkit.item.enchantment.Enchantment;
 
-import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * Created on 2015/12/11 by Pub4Game.
@@ -42,10 +43,18 @@ public class BlockMelon extends BlockSolid {
 
     @Override
     public Item[] getDrops(Item item) {
+        ThreadLocalRandom random = ThreadLocalRandom.current();
+
+        int count = random.nextInt(5) + 3;
+
+        Enchantment fortune = item.getEnchantment(Enchantment.ID_FORTUNE_DIGGING);
+        if (fortune != null && fortune.getLevel() >= 1) {
+            count += random.nextInt(fortune.getLevel() + 1);
+        }
         return new Item[]{
-                new ItemMelon(0, new Random().nextInt(4) + 3)
-        };
-    }
+        new ItemMelon(0, Math.min(9, count))
+    };
+}
 
     @Override
     public int getToolType() {

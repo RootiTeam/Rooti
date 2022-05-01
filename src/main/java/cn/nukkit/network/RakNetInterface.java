@@ -3,6 +3,7 @@ package cn.nukkit.network;
 import cn.nukkit.Nukkit;
 import cn.nukkit.Player;
 import cn.nukkit.Server;
+import cn.nukkit.utils.ThreadedLogger;
 import cn.nukkit.event.player.PlayerCreationEvent;
 import cn.nukkit.event.server.QueryRegenerateEvent;
 import cn.nukkit.network.protocol.BatchPacket;
@@ -19,6 +20,9 @@ import cn.nukkit.utils.MainLogger;
 import cn.nukkit.utils.Utils;
 import cn.nukkit.utils.Zlib;
 
+import lombok.extern.log4j.Log4j2;
+import org.apache.logging.log4j.message.FormattedMessage;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
@@ -28,6 +32,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * author: MagicDroidX
  * Nukkit Project
  */
+@Log4j2
 public class RakNetInterface implements ServerInstance, AdvancedSourceInterface {
 
     private final Server server;
@@ -51,7 +56,7 @@ public class RakNetInterface implements ServerInstance, AdvancedSourceInterface 
     public RakNetInterface(Server server) {
         this.server = server;
 
-        this.raknet = new RakNetServer(this.server.getLogger(), this.server.getPort(), this.server.getIp().equals("") ? "0.0.0.0" : this.server.getIp());
+        this.raknet = new RakNetServer(this.server.getPort(), this.server.getIp().equals("") ? "0.0.0.0" : this.server.getIp());
         this.handler = new ServerHandler(this.raknet, this);
     }
 

@@ -4,9 +4,9 @@ import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemRedstone;
 import cn.nukkit.item.ItemTool;
 import cn.nukkit.level.Level;
-import cn.nukkit.math.NukkitRandom;
+import cn.nukkit.item.enchantment.Enchantment;
 
-import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * author: MagicDroidX
@@ -19,7 +19,7 @@ public class BlockOreRedstone extends BlockSolid {
     }
 
     public BlockOreRedstone(int meta) {
-        super(0);
+        super(meta);
     }
 
     @Override
@@ -50,13 +50,20 @@ public class BlockOreRedstone extends BlockSolid {
     @Override
     public Item[] getDrops(Item item) {
         if (item.isPickaxe() && item.getTier() >= ItemTool.TIER_IRON) {
+            int count = ThreadLocalRandom.current().nextInt(2) + 4;
+
+            Enchantment fortune = item.getEnchantment(Enchantment.ID_FORTUNE_DIGGING);
+            if (fortune != null && fortune.getLevel() >= 1) {
+                count += ThreadLocalRandom.current().nextInt(fortune.getLevel() + 1);
+            }
+
             return new Item[]{
-                    new ItemRedstone(0, new Random().nextInt(1) + 4)
+                    new ItemRedstone(0, count)
             };
         } else {
             return new Item[0];
         }
-    }
+}
 
     @Override
     public int onUpdate(int type) {
@@ -71,7 +78,7 @@ public class BlockOreRedstone extends BlockSolid {
 
     @Override
     public int getDropExp() {
-        return new NukkitRandom().nextRange(1, 5);
+        return ThreadLocalRandom.current().nextInt(5);
     }
 
     @Override

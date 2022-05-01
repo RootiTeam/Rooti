@@ -149,6 +149,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     protected String iusername;
     protected String displayName;
 
+    protected boolean isFloodingPackets = false;
+    protected Map<String, Integer> handleQueuePackets = new HashMap<>();
+    protected Map<String, Date> handleQueueTime = new HashMap<>();
+
     protected int startAction = -1;
 
     protected Vector3 sleeping = null;
@@ -1968,8 +1972,48 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         this.server.onPlayerLogin(this);
     }
 
+    public static Date getNowTime() {
+        Date now = new Date();
+        return now;
+    }
+
+    public boolean isFlooding(String address, int port) {
+        if (!address.isEmpty()) {
+            if (!this.handleQueuePackets.containsKey(address)) {
+                this.handleQueuePackets.put(address, 0);
+                this.handleQueueTime.put(address, this.getNowTime());
+            }
+
+            int result = this.getNowTime().compareTo(this.handleQueueTime.get(address));
+
+            if (result > 0) {
+                this.handleQueueTime.remove(address);
+                this.handleQueuePackets.remove(address);
+
+                return false;
+            }
+
+            if (result == 0) {
+                this.handleQueuePackets.put(address, this.handleQueuePackets.get(address) + 1);
+            }
+
+            if (this.handleQueuePackets.get(address) > 100) {
+            this.isFloodingPackets = true;
+            this.getServer().getLogger().warning("Flood detected from " + address);
+            this.handleQueueTime.remove(address);
+            this.handleQueuePackets.remove(address);
+            return true;
+        }
+    }
+        return false;
+}
     public void handleDataPacket(DataPacket packet) {
         if (!connected) return;
+
+        if (this.isFlooding(this.getAddress(), this.getPort())) {
+            this.close(this.getLeaveMessage(), "%nukkit.network.flood");
+            return;
+        }
 
         if (this.getClientId() == -1) {
             this.close(this.getLeaveMessage(), "Incorrect ClientID");

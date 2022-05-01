@@ -3,9 +3,9 @@ package cn.nukkit.block;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemDye;
 import cn.nukkit.item.ItemTool;
-import cn.nukkit.math.NukkitRandom;
+import cn.nukkit.item.enchantment.Enchantment;
 
-import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * author: MagicDroidX
@@ -19,7 +19,7 @@ public class BlockOreLapis extends BlockSolid {
     }
 
     public BlockOreLapis(int meta) {
-        super(0);
+        super(meta);
     }
 
     @Override
@@ -50,17 +50,29 @@ public class BlockOreLapis extends BlockSolid {
     @Override
     public Item[] getDrops(Item item) {
         if (item.isPickaxe() && item.getTier() >= ItemTool.TIER_STONE) {
+            int count = 4 + ThreadLocalRandom.current().nextInt(5);
+            Enchantment fortune = item.getEnchantment(Enchantment.ID_FORTUNE_DIGGING);
+            if (fortune != null && fortune.getLevel() >= 1) {
+                int i = ThreadLocalRandom.current().nextInt(fortune.getLevel() + 2) - 1;
+
+                if (i < 0) {
+                    i = 0;
+                }
+
+                count *= (i + 1);
+            }
+
             return new Item[]{
-                    new ItemDye(4, new Random().nextInt(4) + 4)
+                    new ItemDye(4, ThreadLocalRandom.current().nextInt(4) + 4)
             };
         } else {
             return new Item[0];
         }
-    }
+}
 
     @Override
     public int getDropExp() {
-        return new NukkitRandom().nextRange(2, 5);
+        return ThreadLocalRandom.current().nextInt(5);
     }
 
     @Override
