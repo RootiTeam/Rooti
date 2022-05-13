@@ -3032,6 +3032,21 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     EntityEventPacket entityEventPacket = (EntityEventPacket) packet;
 
                     switch (entityEventPacket.event) {
+                        case EntityEventPacket.EATING_ITEM:
+                            if (entityEventPacket.data == 0) {
+                               break;
+                            }
+                            if (Item.get(entityEventPacket.data) instanceof ItemBlock) { //TODO: Validate eat item, because crash clients.
+                                this.close(this.getLeaveMessage(), "Invalid eat item");
+                                break;
+                            }
+                            EntityEventPacket EntityEatPk = new EntityEventPacket();
+                            EntityEatPk.event = EntityEventPacket.EATING_ITEM;
+                            EntityEatPk.data = entityEventPacket.data;
+                            EntityEatPk.eid = this.getId();
+                            this.dataPacket(EntityEatPk);
+                            Server.broadcastPacket(this.getViewers().values(), EntityEatPk);
+                        break;
                         case EntityEventPacket.USE_ITEM: //Eating
                             Item itemInHand = this.inventory.getItemInHand();
                             PlayerItemConsumeEvent consumeEvent = new PlayerItemConsumeEvent(this, itemInHand);
