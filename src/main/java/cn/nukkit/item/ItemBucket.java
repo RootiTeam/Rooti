@@ -68,6 +68,10 @@ public class ItemBucket extends Item {
     @Override
     public boolean onActivate(Level level, Player player, Block block, Block target, BlockFace face, double fx, double fy, double fz) {
         Block targetBlock = Block.get(this.meta);
+        
+        if (player.isAdventure()) {
+            return false;
+        }
 
         if (targetBlock instanceof BlockAir) {
             if (target instanceof BlockLiquid && target.getDamage() == 0) {
