@@ -191,7 +191,7 @@ public class Server {
 
     private Level defaultLevel = null;
 
-    private Thread currentThread;
+    private final Thread currentThread;
     
     Server(final String filePath, String dataPath, String pluginPath) {
         Preconditions.checkState(instance == null, "Already initialized!");
@@ -1943,7 +1943,7 @@ public class Server {
      * <b>Note:</b> this method should not be used to indicate the current synchronized state of the runtime. A current thread matching the main thread indicates that it is synchronized, but a mismatch does not preclude the same assumption.
      * @return true if the current thread matches the expected primary thread, false otherwise
      */
-    public boolean isPrimaryThread() {
+    public final boolean isPrimaryThread() {
         return (Thread.currentThread() == currentThread);
     }
     

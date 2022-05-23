@@ -16,6 +16,7 @@ dependencies {
     implementation("net.sf.jopt-simple:jopt-simple:5.0.4")
     implementation("net.minecrell:terminalconsoleappender:1.1.1")
     implementation("org.jline:jline-reader:3.21.0")
+    implementation("it.unimi.dsi:fastutil:6.3")
     implementation("org.jline:jline-terminal-jna:3.21.0")
     implementation("org.jline:jline-terminal:3.21.0")
     implementation("org.apache.logging.log4j:log4j-api:2.17.2")

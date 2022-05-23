@@ -7,6 +7,7 @@ import cn.nukkit.blockentity.BlockEntity;
 import cn.nukkit.blockentity.BlockEntityChest;
 import cn.nukkit.blockentity.BlockEntityShulkerBox;
 import cn.nukkit.entity.Entity;
+import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import cn.nukkit.scheduler.BlockUpdateScheduler;
 import cn.nukkit.entity.item.EntityItem;
 import cn.nukkit.entity.item.EntityXPOrb;
@@ -34,6 +35,7 @@ import cn.nukkit.level.format.generic.EmptyChunkSection;
 import cn.nukkit.level.format.leveldb.LevelDB;
 import cn.nukkit.level.format.mcregion.McRegion;
 import cn.nukkit.level.generator.Generator;
+import cn.nukkit.level.generator.PopChunkManager;
 import cn.nukkit.level.generator.task.*;
 import cn.nukkit.level.particle.DestroyBlockParticle;
 import cn.nukkit.level.particle.Particle;
@@ -133,7 +135,7 @@ public class Level implements ChunkManager, Metadatable {
 
     private final Map<Long, Map<Integer, Player>> playerLoaders = new HashMap<>();
 
-    private Map<Long, List<DataPacket>> chunkPackets = new HashMap<>();
+    private final Long2ObjectOpenHashMap<Deque<DataPacket>> chunkPackets = new Long2ObjectOpenHashMap<>();
 
     private final Map<Long, Long> unloadQueue = new HashMap<>();
 
@@ -231,7 +233,25 @@ public class Level implements ChunkManager, Metadatable {
     public int tickRateTime = 0;
     public int tickRateCounter = 0;
 
-    private Class<? extends Generator> generator;
+    private Class<? extends Generator> generatorClass;
+    private IterableThreadLocal<Generator> generators = new IterableThreadLocal<Generator>() {
+        @Override
+        public Generator init() {
+            try {
+                Generator generator = generatorClass.getConstructor(Map.class).newInstance(provider.getGeneratorOptions());
+                NukkitRandom rand = new NukkitRandom(getSeed());
+                ChunkManager manager;
+                if (Server.getInstance().isPrimaryThread()) {
+                    generator.init(Level.this, rand);
+                }
+                generator.init(new PopChunkManager(getSeed()), rand);
+                return generator;
+            } catch (Throwable e) {
+                e.printStackTrace();
+                return null;
+            }
+        }
+    };
     private Generator generatorInstance;
 
     public final java.util.Random rand = new java.util.Random();
@@ -286,7 +306,7 @@ public class Level implements ChunkManager, Metadatable {
         this.server.getLogger().info(this.server.getLanguage().translateString("nukkit.level.preparing",
                 TextFormat.GREEN + this.provider.getName() + TextFormat.WHITE));
 
-        this.generator = Generator.getGenerator(this.provider.getGenerator());
+        this.generatorClass = Generator.getGenerator(this.provider.getGenerator());
 
         try {
             this.useSections = (boolean) provider.getMethod("usesChunkSection").invoke(null);
@@ -396,7 +416,7 @@ public class Level implements ChunkManager, Metadatable {
 
     public void initLevel() {
         try {
-            this.generatorInstance = this.generator.getConstructor(Map.class)
+            this.generatorInstance = this.generatorClass.getConstructor(Map.class)
                     .newInstance(this.provider.getGeneratorOptions());
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -609,10 +629,10 @@ public class Level implements ChunkManager, Metadatable {
 
     public void addChunkPacket(int chunkX, int chunkZ, DataPacket packet) {
         Long index = Level.chunkHash(chunkX, chunkZ);
-        if (!this.chunkPackets.containsKey(index)) {
-            this.chunkPackets.put(index, new ArrayList<>());
+        synchronized (chunkPackets) {
+            Deque<DataPacket> packets = chunkPackets.computeIfAbsent(index, i -> new ArrayDeque<>());
+            packets.add(packet);
         }
-        this.chunkPackets.get(index).add(packet);
     }
 
     public void registerChunkLoader(ChunkLoader loader, int chunkX, int chunkZ) {
@@ -849,15 +869,18 @@ public class Level implements ChunkManager, Metadatable {
             this.checkSleep();
         }
 
-        for (long index : this.chunkPackets.keySet()) {
-            int chunkX = Level.getHashX(index);
-            int chunkZ = Level.getHashZ(index);
-            Player[] chunkPlayers = this.getChunkPlayers(chunkX, chunkZ).values().stream().toArray(Player[]::new);
-            if (chunkPlayers.length > 0) {
-                for (DataPacket pk : this.chunkPackets.get(index)) {
-                    Server.broadcastPacket(chunkPlayers, pk);
+       synchronized (chunkPackets) {
+            for (long index : this.chunkPackets.keySet()) {
+                int chunkX = Level.getHashX(index);
+                int chunkZ = Level.getHashZ(index);
+                Player[] chunkPlayers = this.getChunkPlayers(chunkX, chunkZ).values().toArray(new Player[0]);
+                if (chunkPlayers.length > 0) {
+                    for (DataPacket pk : this.chunkPackets.get(index)) {
+                        Server.broadcastPacket(chunkPlayers, pk);
+                    }
                 }
             }
+            this.chunkPackets.clear();
         }
 
         this.chunkPackets.clear();
@@ -2321,30 +2344,46 @@ public class Level implements ChunkManager, Metadatable {
 
         Long index = Level.chunkHash(chunkX, chunkZ);
         FullChunk oldChunk = this.getChunk(chunkX, chunkZ, false);
-        if (unload && oldChunk != null) {
-            this.unloadChunk(chunkX, chunkZ, false, false);
+       if (oldChunk != chunk) {
+            if (unload && oldChunk != null) {
+                this.unloadChunk(chunkX, chunkZ, false, false);
 
-            this.provider.setChunk(chunkX, chunkZ, chunk);
-            this.chunks.put(index, chunk);
-        } else {
-            Map<Long, Entity> oldEntities = oldChunk != null ? oldChunk.getEntities() : new HashMap<>();
+                this.provider.setChunk(chunkX, chunkZ, chunk);
+            } else {
+                Map<Long, Entity> oldEntities = oldChunk != null ? oldChunk.getEntities() : Collections.emptyMap();
 
-            Map<Long, BlockEntity> oldBlockEntities = oldChunk != null ? oldChunk.getBlockEntities() : new HashMap<>();
+                Map<Long, BlockEntity> oldBlockEntities = oldChunk != null ? oldChunk.getBlockEntities() : Collections.emptyMap();
 
-            for (Entity entity : oldEntities.values()) {
-                chunk.addEntity(entity);
-                oldChunk.removeEntity(entity);
-                entity.chunk = chunk;
+                if (!oldEntities.isEmpty()) {
+                    Iterator<Map.Entry<Long, Entity>> iter = oldEntities.entrySet().iterator();
+                    while (iter.hasNext()) {
+                        Map.Entry<Long, Entity> entry = iter.next();
+                        Entity entity = entry.getValue();
+                        chunk.addEntity(entity);
+                        if (oldChunk != null) {
+                            iter.remove();
+                            oldChunk.removeEntity(entity);
+                            entity.chunk = chunk;
+                        }
+                    }
+                }
+
+                if (!oldBlockEntities.isEmpty()) {
+                    Iterator<Map.Entry<Long, BlockEntity>> iter = oldBlockEntities.entrySet().iterator();
+                    while (iter.hasNext()) {
+                        Map.Entry<Long, BlockEntity> entry = iter.next();
+                        BlockEntity blockEntity = entry.getValue();
+                        chunk.addBlockEntity(blockEntity);
+                        if (oldChunk != null) {
+                            iter.remove();
+                            oldChunk.removeBlockEntity(blockEntity);
+                            blockEntity.chunk = chunk;
+                        }
+                    }
+                }
+
+                this.provider.setChunk(chunkX, chunkZ, chunk);
             }
-
-            for (BlockEntity blockEntity : oldBlockEntities.values()) {
-                chunk.addBlockEntity(blockEntity);
-                oldChunk.removeBlockEntity(blockEntity);
-                blockEntity.chunk = chunk;
-            }
-
-            this.provider.setChunk(chunkX, chunkZ, chunk);
-            this.chunks.put(index, chunk);
         }
 
         this.chunkCache.remove(index);
@@ -2361,6 +2400,10 @@ public class Level implements ChunkManager, Metadatable {
 
     public int getHighestBlockAt(int x, int z) {
         return this.getChunk(x >> 4, z >> 4, true).getHighestBlockAt(x & 0x0f, z & 0x0f);
+    }
+
+    public Generator getGenerator() {
+        return generators.get();
     }
 
     public BlockColor getMapColorAt(int x, int z) {
