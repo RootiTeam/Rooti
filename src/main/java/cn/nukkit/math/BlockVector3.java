@@ -11,13 +11,17 @@ public class BlockVector3 implements Cloneable {
         this.z = z;
     }
 
-    public BlockVector3() {
-    }
-
     public BlockVector3 setComponents(int x, int y, int z) {
         this.x = x;
         this.y = y;
         this.z = z;
+        return this;
+    }
+    
+    public BlockVector3 setComponentsAdding(Vector3 pos, BlockFace face) {
+        this.x = pos.getFloorX() + face.getXOffset();
+        this.y = pos.getFloorY() + face.getYOffset();
+        this.z = pos.getFloorZ() + face.getZOffset();
         return this;
     }
 
