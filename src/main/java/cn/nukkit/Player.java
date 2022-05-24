@@ -134,6 +134,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     protected String deviceModel;
 
     protected int inputMode;
+    
+    protected int protocol;
 
     protected Vector3 forceMovement = null;
 
@@ -246,6 +248,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     @Deprecated
     public Long getClientId() {
         return randomClientId;
+    }
+    
+    public Integer getProtocol() {
+        return protocol;
     }
 
     public String getDeviceModel() {
@@ -1348,11 +1354,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 pk.target = entity.getId();
                 Server.broadcastPacket(entity.getViewers().values(), pk);
 
-                pk = new TakeItemEntityPacket();
-                pk.entityId = this.id;
-                pk.target = entity.getId();
-                this.dataPacket(pk);
-
                 this.inventory.addItem(item.clone());
                 entity.kill();
             } else if (entity instanceof EntityItem) {
@@ -1392,11 +1393,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         pk.entityId = this.getId();
                         pk.target = entity.getId();
                         Server.broadcastPacket(entity.getViewers().values(), pk);
-
-                        pk = new TakeItemEntityPacket();
-                        pk.entityId = this.id;
-                        pk.target = entity.getId();
-                        this.dataPacket(pk);
 
                         this.inventory.addItem(item.clone());
                         entity.kill();
@@ -1879,6 +1875,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
         Position spawnPosition = this.getSpawn();
         StartGamePacket startGamePacket = new StartGamePacket();
+        startGamePacket.protocol = this.protocol;
         startGamePacket.entityUniqueId = this.id;
         startGamePacket.entityRuntimeId = this.id;
         startGamePacket.playerGamemode = getClientFriendlyGamemode(this.gamemode);
@@ -2029,9 +2026,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
                             PlayStatusPacket pk = new PlayStatusPacket();
                             pk.status = PlayStatusPacket.LOGIN_FAILED_SERVER;
-                            this.directDataPacket(pk);
+                          //  this.directDataPacket(pk);
                         }
-                        this.close("", message, false);
+                       // this.close("", message, false);
                         break;
                     }
 
@@ -2048,6 +2045,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
                     this.randomClientId = loginPacket.clientId;
                     this.deviceOS = loginPacket.deviceOS;
+                    this.protocol = loginPacket.getProtocol();
                     this.deviceModel = loginPacket.deviceModel;
                     this.inputMode = loginPacket.clientInput;
 
@@ -3731,7 +3729,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                             break;
                         }
                         this.setGamemode(setPlayerGameTypePacket.gamemode, true);
-                        Command.broadcastCommandMessage(this, new TranslationContainer("commands.gamemode.success.self", Server.getGamemodeString(this.gamemode)));
                     }
                     break;
                 case ProtocolInfo.ITEM_FRAME_DROP_ITEM_PACKET:
@@ -4923,13 +4920,13 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     }
 
     public void transfer(InetSocketAddress address) {
-        String hostName = address.getHostName();
+        String hostName = address.getAddress().getHostName();
         int port = address.getPort();
         TransferPacket pk = new TransferPacket();
         pk.address = hostName;
         pk.port = port;
         this.dataPacket(pk);
-        String message = "Transferred to " + address + ":" + port;
+        String message = "Transferred to " + hostName + ":" + port;
         this.close(message, message, false);
     }
 

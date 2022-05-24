@@ -188,6 +188,11 @@ public class RakNetInterface implements ServerInstance, AdvancedSourceInterface 
     public void blockAddress(String address, int timeout) {
         this.handler.blockAddress(address, timeout);
     }
+    
+    @Override
+    public void unblockAddress(String address) {
+        this.handler.unblockAddress(address);
+    }
 
     @Override
     public void handleRaw(String address, int port, byte[] payload) {
@@ -208,19 +213,18 @@ public class RakNetInterface implements ServerInstance, AdvancedSourceInterface 
     }
 
     @Override
-    public void setName(String name) {
+      public void setName(String name) {
         QueryRegenerateEvent info = this.server.getQueryInformation();
-
+        String[] names = name.split("!@#");  //Split double names within the program
         this.handler.sendOption("name",
-                "MCPE;" + Utils.rtrim(name.replace(";", "\\;"), '\\') + ";" +
+                "MCPE;" + Utils.rtrim(names[0].replace(";", "\\;"), '\\') + ";" +
                         ProtocolInfo.CURRENT_PROTOCOL + ";" +
                         ProtocolInfo.MINECRAFT_VERSION_NETWORK + ";" +
                         info.getPlayerCount() + ";" +
-                        info.getMaxPlayerCount());
-    }
-
-    public void setPortCheck(boolean value) {
-        this.handler.sendOption("portChecking", String.valueOf(value));
+                        info.getMaxPlayerCount() + ";" +
+                        this.server.getServerUniqueId().toString() + ";" +
+                        (names.length > 1 ? Utils.rtrim(names[1].replace(";", "\\;"), '\\') : "") + ";" +
+                        Server.getGamemodeString(this.server.getDefaultGamemode()) + ";");
     }
 
     @Override

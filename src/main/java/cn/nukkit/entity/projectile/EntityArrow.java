@@ -29,6 +29,11 @@ public class EntityArrow extends EntityProjectile {
     public float getLength() {
         return 0.5f;
     }
+    
+    @Override
+    protected double getBaseDamage() {
+        return 2;
+    }
 
     @Override
     public float getHeight() {

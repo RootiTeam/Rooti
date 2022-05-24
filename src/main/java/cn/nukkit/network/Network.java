@@ -210,7 +210,13 @@ public class Network {
             interfaz.blockAddress(address, timeout);
         }
     }
-
+    
+    public void unblockAddress(String address) {
+        for(AdvancedSourceInterface interfuck : this.advancedInterfaces) {
+            interfuck.unblockAddress(address);
+        }
+    }
+    
     private void registerPackets() {
         this.packetPool = new Class[256];
         

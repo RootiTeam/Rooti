@@ -175,13 +175,15 @@ public class Potion implements Cloneable {
             }
         }
 
-        PotionApplyEvent event = new PotionApplyEvent(this, entity);
+        PotionApplyEvent event = new PotionApplyEvent(this, applyEffect, entity);
 
         entity.getServer().getPluginManager().callEvent(event);
         if (event.isCancelled()) {
             return;
         }
 
+        applyEffect = event.getApplyEffect();
+        
         switch (this.getId()) {
             case INSTANT_HEALTH:
             case INSTANT_HEALTH_II:

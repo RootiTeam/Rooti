@@ -159,7 +159,7 @@ public class Server {
     private int autoSaveTicker = 0;
     private int autoSaveTicks = 6000;
 
-    private BaseLang baseLang;
+    public static BaseLang baseLang;
 
     private boolean forceLanguage = false;
 
@@ -1310,7 +1310,7 @@ public class Server {
     }
 
     public String getMotd() {
-        return this.getPropertyString("motd", "Nukkit Server For Minecraft: PE");
+        return this.getPropertyString("motd", "Rooti Server For Minecraft: PE");
     }
 
     public boolean getForceResources() {
@@ -1739,7 +1739,7 @@ public class Server {
         return true;
     }
 
-    public BaseLang getLanguage() {
+    public static BaseLang getLanguage() {
         return baseLang;
     }
 

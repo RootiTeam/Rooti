@@ -423,6 +423,10 @@ public class Level implements ChunkManager, Metadatable {
         }
         this.generatorInstance.init(this, new NukkitRandom(this.getSeed()));
         this.dimension = this.generatorInstance.getDimension();
+        this.server.getLogger().info(this.server.getLanguage().translateString("nukkit.level.spawn",
+                TextFormat.GREEN + this.getFolderName() + TextFormat.WHITE));
+        Position spawn = this.getSpawnLocation();
+        this.populateChunk(spawn.getChunkX(), spawn.getChunkZ(), true);
 
         this.registerGenerator();
     }
@@ -2734,7 +2738,7 @@ public class Level implements ChunkManager, Metadatable {
             FullChunk chunk = this.getChunk((int) v.x >> 4, (int) v.z >> 4, false);
             int x = (int) v.x & 0x0f;
             int z = (int) v.z & 0x0f;
-            if (chunk != null) {
+            if (chunk != null && chunk.isGenerated()) {
                 int y = (int) Math.min(254, v.y);
                 boolean wasAir = chunk.getBlockId(x, y - 1, z) == 0;
                 for (; y > 0; --y) {

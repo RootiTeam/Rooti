@@ -76,9 +76,9 @@ public class GamemodeCommand extends VanillaCommand {
             sender.sendMessage("Game mode update for " + target.getName() + " failed");
         } else {
             if (target.equals(sender)) {
-                Command.broadcastCommandMessage(sender, new TranslationContainer("commands.gamemode.success.self", Server.getGamemodeString(gameMode)));
+                Command.broadcastCommandMessage(sender, Server.getLanguage().translateString("commands.gamemode.success.self") + " " + Server.getGamemodeString(gameMode));
             } else {
-                target.sendMessage(new TranslationContainer("gameMode.changed"));
+                target.sendMessage(new TranslationContainer("gameMode.changed", Server.getGamemodeString(gameMode)));
                 Command.broadcastCommandMessage(sender, new TranslationContainer("commands.gamemode.success.other", new String[]{target.getName(), Server.getGamemodeString(gameMode)}));
             }
         }

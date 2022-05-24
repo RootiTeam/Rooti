@@ -18,6 +18,7 @@ public class StartGamePacket extends DataPacket {
 
     public long entityUniqueId;
     public long entityRuntimeId;
+    public int protocol;
     public int playerGamemode;
     public float x;
     public float y;
@@ -45,6 +46,10 @@ public class StartGamePacket extends DataPacket {
     public String premiumWorldTemplateId = "";
     public boolean unknown = false;
     public long currentTick;
+    public int serverChunkTickRange = 4;
+    public boolean hasPlatformBroadcast = true;
+    public int platformBroadcastMode = 3;
+    public boolean xblBroadcastIntent = false;
 
     @Override
     public void decode() {
