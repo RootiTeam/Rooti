@@ -2026,9 +2026,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
                             PlayStatusPacket pk = new PlayStatusPacket();
                             pk.status = PlayStatusPacket.LOGIN_FAILED_SERVER;
-                          //  this.directDataPacket(pk);
+                            this.directDataPacket(pk);
                         }
-                       // this.close("", message, false);
+                        this.close("", message, false);
                         break;
                     }
 
