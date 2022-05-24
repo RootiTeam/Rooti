@@ -159,7 +159,7 @@ public class Server {
     private int autoSaveTicker = 0;
     private int autoSaveTicks = 6000;
 
-    public static BaseLang baseLang;
+    private BaseLang baseLang;
 
     private boolean forceLanguage = false;
 
@@ -1739,7 +1739,7 @@ public class Server {
         return true;
     }
 
-    public static BaseLang getLanguage() {
+    public BaseLang getLanguage() {
         return baseLang;
     }
 

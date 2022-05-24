@@ -1990,11 +1990,11 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             this.close(this.getLeaveMessage(), "Incorrect ClientID");
             return;
         }
+        
         try (Timing timing = Timings.getReceiveDataPacketTiming(packet)) {
             DataPacketReceiveEvent ev = new DataPacketReceiveEvent(this, packet);
             this.server.getPluginManager().callEvent(ev);
             if (ev.isCancelled()) {
-                timing.stopTiming();
                 return;
             }
 
