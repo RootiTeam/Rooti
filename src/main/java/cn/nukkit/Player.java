@@ -20,6 +20,7 @@ import cn.nukkit.entity.item.*;
 import cn.nukkit.entity.mob.EntityCreeper;
 import cn.nukkit.entity.projectile.*;
 import cn.nukkit.event.block.ItemFrameDropItemEvent;
+import cn.nukkit.event.block.ItemFrameSpinItemEvent;
 import cn.nukkit.event.block.SignChangeEvent;
 import cn.nukkit.event.entity.*;
 import cn.nukkit.event.entity.EntityDamageEvent.DamageCause;
@@ -2286,6 +2287,21 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     Vector3 blockVector = new Vector3(useItemPacket.x, useItemPacket.y, useItemPacket.z);
 
                     this.craftingType = CRAFTING_SMALL;
+
+                    if (useItemPacket.interactBlockId == Item.ITEM_FRAME_BLOCK) {
+                        Vector3 vector3 = this.temporalVector.setComponents(useItemPacket.x, useItemPacket.y, useItemPacket.z);
+                        BlockEntity blockEntityItemFrame = this.level.getBlockEntity(vector3);
+                        BlockEntityItemFrame itemFrame = (BlockEntityItemFrame) blockEntityItemFrame;
+                        if (itemFrame != null) {
+                            Block block = itemFrame.getBlock();
+                            Item itemInFrame = itemFrame.getItem();
+                            ItemFrameSpinItemEvent frameSpinEvent = new ItemFrameSpinItemEvent(this, block, itemInFrame, itemFrame);
+                            this.server.getPluginManager().callEvent(frameSpinEvent);
+                            if (frameSpinEvent.isCancelled()) {
+                                    break;
+                            }
+                        }
+                    }
 
                     if (useItemPacket.face >= 0 && useItemPacket.face <= 5) {
                         BlockFace face = BlockFace.fromIndex(useItemPacket.face);
