@@ -1052,6 +1052,7 @@ public class Server {
             }
 
             this.getNetwork().updateName();
+            this.getNetwork().resetStatistics();
         }
 
         if (this.autoSave && ++this.autoSaveTicker >= this.autoSaveTicks) {
