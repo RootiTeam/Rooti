@@ -284,15 +284,15 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
     @Override
     public boolean isWhitelisted() {
-        return this.server.isWhitelisted(this.getName().toLowerCase());
+        return this.server.isWhitelisted(this.getLowerCaseName());
     }
 
     @Override
     public void setWhitelisted(boolean value) {
         if (value) {
-            this.server.addWhitelist(this.getName().toLowerCase());
+            this.server.addWhitelist(this.getLowerCaseName());
         } else {
-            this.server.removeWhitelist(this.getName().toLowerCase());
+            this.server.removeWhitelist(this.getLowerCaseName());
         }
     }
 
@@ -419,7 +419,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
     @Override
     public boolean isOp() {
-        return this.server.isOp(this.getName());
+        return this.server.isOp(this.getLowerCaseName());
     }
 
     @Override
@@ -429,9 +429,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         }
 
         if (value) {
-            this.server.addOp(this.getName());
+            this.server.addOp(this.getLowerCaseName());
         } else {
-            this.server.removeOp(this.getName());
+            this.server.removeOp(this.getLowerCaseName());
         }
 
         this.recalculatePermissions();
@@ -1472,7 +1472,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                             if (!ev.isCancelled()) {
                                 revert = ev.isRevert();
                                 if (revert) {
-                                    this.server.getLogger().debug(this.getServer().getLanguage().translateString("nukkit.player.invalidMove", this.getName()));
+                                    this.server.getLogger().debug(this.getServer().getLanguage().translateString("nukkit.player.invalidMove", this.getLowerCaseName()));
                                 }
                             }
                         }
@@ -1743,7 +1743,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     }
 
     protected void processLogin() {
-        if (!this.server.isWhitelisted((this.getName()).toLowerCase())) {
+        if (!this.server.isWhitelisted(this.getLowerCaseName()) {
             this.kick(PlayerKickEvent.Reason.NOT_WHITELISTED, "Server is white-listed");
 
             return;
@@ -1762,7 +1762,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         }
 
         for (Player p : new ArrayList<>(this.server.getOnlinePlayers().values())) {
-            if (p != this && p.getName() != null && p.getName().equalsIgnoreCase(this.getName())) {
+            if (p != this && p.getLowerCaseName() != null && p.getName().equalsIgnoreCase(this.getLowerCaseName())) {
                 if (!p.kick(PlayerKickEvent.Reason.NEW_CONNECTION, "logged in from another location")) {
                     this.close(this.getLeaveMessage(), "Already connected");
                     return;
@@ -2898,7 +2898,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
                     if (targetEntity instanceof EntityItem || targetEntity instanceof EntityArrow || targetEntity instanceof EntityXPOrb) {
                         this.kick(PlayerKickEvent.Reason.INVALID_PVE, "Attempting to attack an invalid entity");
-                        this.server.getLogger().warning(this.getServer().getLanguage().translateString("nukkit.player.invalidEntity", this.getName()));
+                        this.server.getLogger().warning(this.getServer().getLanguage().translateString("nukkit.player.invalidEntity", this.getLowerCaseName()));
                         break;
                     }
 
@@ -4011,7 +4011,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
             this.connected = false;
             PlayerQuitEvent ev = null;
-            if (this.getName() != null && this.getName().length() > 0) {
+            if (this.getLowerCaseName() != null && this.getLowerCaseName().length() > 0) {
                 this.server.getPluginManager().callEvent(ev = new PlayerQuitEvent(this, message, true, reason));
                 if (this.loggedIn && ev.getAutoSave()) {
                     this.save();
@@ -5007,6 +5007,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             this.fishing = fishingHook;
             fishingHook.rod = fishingRod;
         }
+    }
+
+    public string getLowerCaseName() {
+        return this.iusername;
     }
 
     /**
