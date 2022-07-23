@@ -1743,7 +1743,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     }
 
     protected void processLogin() {
-        if (!this.server.isWhitelisted(this.getLowerCaseName()) {
+        if (!this.server.isWhitelisted(this.getLowerCaseName())) {
             this.kick(PlayerKickEvent.Reason.NOT_WHITELISTED, "Server is white-listed");
 
             return;
@@ -5009,7 +5009,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         }
     }
 
-    public string getLowerCaseName() {
+    public String getLowerCaseName() {
         return this.iusername;
     }
 
