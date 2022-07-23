@@ -54,6 +54,7 @@ import cn.nukkit.permission.BanList;
 import cn.nukkit.permission.DefaultPermissions;
 import cn.nukkit.permission.Permissible;
 import cn.nukkit.plugin.JavaPluginLoader;
+import cn.nukkit.plugin.SourcePluginLoader;
 import cn.nukkit.plugin.Plugin;
 import cn.nukkit.plugin.PluginLoadOrder;
 import cn.nukkit.plugin.PluginManager;
@@ -73,6 +74,15 @@ import lombok.extern.log4j.Log4j2;
 import java.io.*;
 import java.nio.ByteOrder;
 import java.util.*;
+
+import java.util.jar.Attributes;
+import java.util.jar.JarEntry;
+import java.util.jar.JarOutputStream;
+import java.util.jar.Manifest;
+import javax.tools.JavaCompiler;
+import javax.tools.ToolProvider;
+import java.net.URL;
+import java.net.URLClassLoader;
 
 /**
  * @author MagicDroidX
@@ -172,6 +182,8 @@ public class Server {
     private final Set<UUID> uniquePlayers = new HashSet<>();
 
     private QueryHandler queryHandler;
+
+    private JavaCompiler compiler = null;
 
     private QueryRegenerateEvent queryRegenerateEvent;
 
@@ -392,10 +404,18 @@ public class Server {
         this.pluginManager.subscribeToPermission(Server.BROADCAST_CHANNEL_ADMINISTRATIVE, this.consoleSender);
 
         this.pluginManager.registerInterface(JavaPluginLoader.class);
+        this.pluginManager.registerInterface(SourcePluginLoader.class);
 
         this.queryRegenerateEvent = new QueryRegenerateEvent(this, 5);
 
         this.network.registerInterface(new RakNetInterface(this));
+
+        if (this.checkCompiler() != null) {
+            this.getPluginManager().registerInterface(SourcePluginLoader.class);
+            List<String> loaders = new ArrayList();
+            loaders.add(SourcePluginLoader.class.getName());
+            this.getPluginManager().loadPlugins(new File(this.getPluginPath()), loaders, true);
+        }
 
         this.pluginManager.loadPlugins(this.pluginPath);
 
@@ -492,6 +512,31 @@ public class Server {
 
         return recipients.length;
     }
+
+
+   public JavaCompiler checkCompiler() {
+      this.compiler = ToolProvider.getSystemJavaCompiler();
+      if (this.compiler == null) {
+         this.getLogger().info(TextFormat.AQUA + "Compiler not found, loading third-party compiler...");
+         File jar_file = new File(this.filePath, "tools.jar");
+         if (!jar_file.isFile()) {
+            this.getLogger().error(TextFormat.YELLOW + "Third-party compiler not found, please download and put tools.jar into " + TextFormat.AQUA + this.filePath.toString());
+            return null;
+         }
+
+         try {
+            URLClassLoader loader = new URLClassLoader(new URL[]{jar_file.toURI().toURL()});
+            Class tools = loader.loadClass("com.sun.tools.javac.api.JavacTool");
+            this.compiler = (JavaCompiler)tools.asSubclass(JavaCompiler.class).newInstance();
+         } catch (Exception var4) {
+            this.getLogger().error("Can't load third-party compiler, please use JDK to launch Nukkit or download tools.jar and put it into data folder!");
+            var4.printStackTrace();
+            return null;
+         }
+      }
+
+      return this.compiler;
+   }
 
     public int broadcastMessage(String message, Collection<CommandSender> recipients) {
         for (CommandSender recipient : recipients) {
@@ -2004,6 +2049,10 @@ public class Server {
         BlockEntity.registerBlockEntity(BlockEntity.HOPPER, BlockEntityHopper.class);
         BlockEntity.registerBlockEntity(BlockEntity.BED, BlockEntityBed.class);
         BlockEntity.registerBlockEntity(BlockEntity.SHULKER_BOX, BlockEntityShulkerBox.class);
+    }
+
+    public JavaCompiler getCompiler() {
+        return this.compiler;
     }
 
     public static Server getInstance() {
