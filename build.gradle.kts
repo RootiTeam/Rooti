@@ -25,9 +25,9 @@ dependencies {
     implementation("com.google.code.gson:gson:2.9.0")
     implementation("org.yaml:snakeyaml:1.30")
     implementation("io.netty:netty-all:4.1.76.Final")
+    implementation("org.iq80.leveldb:leveldb:0.12")
     compileOnly("org.projectlombok:lombok:1.18.24")
     annotationProcessor("org.projectlombok:lombok:1.18.24")
-    implementation(files("libs/leveldb.jar"))
 
 }
 
