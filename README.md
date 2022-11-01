@@ -1,5 +1,5 @@
 # Rooti
-Software for Minecraft Bedrock Edition 1.1.x forked Nukkit.
+Software for Minecraft Pocket Edition 1.1.x forked Nukkit.
 
 Java 8 installation
 -------------
