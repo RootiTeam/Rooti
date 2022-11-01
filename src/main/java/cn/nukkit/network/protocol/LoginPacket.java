@@ -16,7 +16,8 @@ import java.util.UUID;
 
 /**
  * Created by on 15-10-13.
- * Updated by ob 20-04-22.
+ * Updated by on 20-04-22.
+ * Updated by on 01-11-22.
  */
 @ToString
 public class LoginPacket extends DataPacket {
@@ -27,6 +28,7 @@ public class LoginPacket extends DataPacket {
     public int protocol;
     public int deviceOS;
     public String deviceModel;
+    public String languageCode;
     public byte gameEdition;
     public UUID clientUUID;
     public long clientId;
@@ -45,7 +47,7 @@ public class LoginPacket extends DataPacket {
         this.gameEdition = (byte) this.getByte();
         this.setBuffer(this.getByteArray(), 0);
         decodeChainData();
-        decodeSkinData();
+        decodeClientData();
     }
 
     @Override
@@ -74,15 +76,16 @@ public class LoginPacket extends DataPacket {
         }
     }
 
-    private void decodeSkinData() {
-        JsonObject skinToken = decodeToken(new String(this.get(this.getLInt())));
+    private void decodeClientData() {
+        JsonObject clientData = decodeToken(new String(this.get(this.getLInt())));
         String skinId = null;
-        if (skinToken.has("ClientRandomId")) this.clientId = skinToken.get("ClientRandomId").getAsLong();
-        if (skinToken.has("DeviceModel")) this.deviceModel = skinToken.get("DeviceModel").getAsString();
-        if (skinToken.has("DeviceOS")) this.deviceOS = skinToken.get("DeviceOS").getAsInt();
-        if (skinToken.has("SkinId")) skinId = skinToken.get("SkinId").getAsString();
-        if (skinToken.has("SkinData")) this.skin = new Skin(skinToken.get("SkinData").getAsString(), skinId);
-        if (skinToken.has("CurrentInputMode")) this.clientInput = skinToken.get("CurrentInputMode").getAsInt();
+        if (clientData.has("ClientRandomId")) this.clientId = clientData.get("ClientRandomId").getAsLong();
+        if (clientData.has("DeviceModel")) this.deviceModel = clientData.get("DeviceModel").getAsString();
+        if (clientData.has("LanguageCode")) this.languageCode = clientData.get("LanguageCode").getAsString();
+        if (clientData.has("DeviceOS")) this.deviceOS = clientData.get("DeviceOS").getAsInt();
+        if (clientData.has("SkinId")) skinId = clientData.get("SkinId").getAsString();
+        if (clientData.has("SkinData")) this.skin = new Skin(clientData.get("SkinData").getAsString(), skinId);
+        if (clientData.has("CurrentInputMode")) this.clientInput = clientData.get("CurrentInputMode").getAsInt();
     }
 
     private JsonObject decodeToken(String token) {

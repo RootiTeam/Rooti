@@ -893,7 +893,8 @@ public class Server {
 
     public void addOnlinePlayer(Player player) {
         this.playerList.put(player.getUniqueId(), player);
-        this.updatePlayerListData(player.getUniqueId(), player.getId(), player.getDisplayName(), player.getSkin());
+        System.out.println(player.getSkin().getModel());
+        this.updatePlayerListData(player.getUniqueId(), player.getId(), player.getPlayerInfo().getDisplayName(), player.getSkin());
     }
 
     public void removeOnlinePlayer(Player player) {
@@ -951,7 +952,7 @@ public class Server {
                 .map(p -> new PlayerListPacket.Entry(
                         p.getUniqueId(),
                         p.getId(),
-                        p.getDisplayName(),
+                        p.getPlayerInfo().getDisplayName(),
                         p.getSkin()))
                 .toArray(PlayerListPacket.Entry[]::new);
 

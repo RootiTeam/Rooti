@@ -35,7 +35,7 @@ public class MeCommand extends VanillaCommand {
 
         String name;
         if (sender instanceof Player) {
-            name = ((Player) sender).getDisplayName();
+            name = ((Player) sender).getPlayerInfo().getDisplayName();
         } else {
             name = sender.getName();
         }

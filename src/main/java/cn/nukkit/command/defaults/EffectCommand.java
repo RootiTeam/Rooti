@@ -50,7 +50,7 @@ public class EffectCommand extends Command {
             for (Effect effect : player.getEffects().values()) {
                 player.removeEffect(effect.getId());
             }
-            sender.sendMessage(new TranslationContainer("commands.effect.success.removed.all", player.getDisplayName()));
+            sender.sendMessage(new TranslationContainer("commands.effect.success.removed.all", player.getPlayerInfo().getDisplayName()));
             return true;
         }
         Effect effect;
@@ -96,18 +96,18 @@ public class EffectCommand extends Command {
         if (duration == 0) {
             if (!player.hasEffect(effect.getId())) {
                 if (player.getEffects().size() == 0) {
-                    sender.sendMessage(new TranslationContainer("commands.effect.failure.notActive.all", player.getDisplayName()));
+                    sender.sendMessage(new TranslationContainer("commands.effect.failure.notActive.all", player.getPlayerInfo().getDisplayName()));
                 } else {
-                    sender.sendMessage(new TranslationContainer("commands.effect.failure.notActive", new String[]{effect.getName(), player.getDisplayName()}));
+                    sender.sendMessage(new TranslationContainer("commands.effect.failure.notActive", new String[]{effect.getName(), player.getPlayerInfo().getDisplayName()}));
                 }
                 return true;
             }
             player.removeEffect(effect.getId());
-            sender.sendMessage(new TranslationContainer("commands.effect.success.removed", new String[]{effect.getName(), player.getDisplayName()}));
+            sender.sendMessage(new TranslationContainer("commands.effect.success.removed", new String[]{effect.getName(), player.getPlayerInfo().getDisplayName()}));
         } else {
             effect.setDuration(duration).setAmplifier(amplification);
             player.addEffect(effect);
-            Command.broadcastCommandMessage(sender, new TranslationContainer("%commands.effect.success", new String[]{effect.getName(), String.valueOf(effect.getId()), String.valueOf(effect.getAmplifier()), player.getDisplayName(), String.valueOf(effect.getDuration() / 20)}));
+            Command.broadcastCommandMessage(sender, new TranslationContainer("%commands.effect.success", new String[]{effect.getName(), String.valueOf(effect.getId()), String.valueOf(effect.getAmplifier()), player.getPlayerInfo().getDisplayName(), String.valueOf(effect.getDuration() / 20)}));
         }
         return true;
     }

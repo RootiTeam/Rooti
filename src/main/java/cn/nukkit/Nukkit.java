@@ -28,9 +28,10 @@ import org.apache.logging.log4j.core.config.LoggerConfig;
 public class Nukkit {
 
     public final static String NAME = "Rooti-java";
-    public final static String VERSION = "1.0.1";
+    public final static String VERSION = "1.0.2";
     public final static String API_VERSION = "1.0.0";
-    public final static String CODENAME = "[RootiTeam]";
+    public final static String ROOTI_API_VERSION = "3.01";
+    public final static String CODENAME = "RootiTeam";
     @Deprecated
     public final static String MINECRAFT_VERSION = ProtocolInfo.MINECRAFT_VERSION;
     @Deprecated
