@@ -4,13 +4,10 @@ package cn.nukkit.utils;
  * author: MagicDroidX
  * Nukkit Project
  */
+@Log4j2
 public class ServerKiller extends Thread {
 
-    public final int time;
-
-    public ServerKiller() {
-        this(15);
-    }
+    public int time;
 
     public ServerKiller(int time) {
         this.time = time;
@@ -20,9 +17,9 @@ public class ServerKiller extends Thread {
     @Override
     public void run() {
         try {
-            sleep(this.time * 1000);
+            sleep(this.time * 1000L);
         } catch (InterruptedException e) {
-            // ignore
+            log.throwing(e);
         }
         System.out.println("\nTook too long to stop, server was killed forcefully!\n");
         System.exit(1);
