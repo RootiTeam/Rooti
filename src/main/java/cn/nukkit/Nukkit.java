@@ -6,7 +6,6 @@ import cn.nukkit.utils.ServerKiller;
 import com.google.common.base.Preconditions;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
-import joptsimple.OptionSpecBuilder;
 import io.netty.util.internal.logging.InternalLoggerFactory;
 import io.netty.util.internal.logging.Log4J2LoggerFactory;
 import lombok.extern.log4j.Log4j2;
@@ -15,16 +14,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.LoggerContext;
 import org.apache.logging.log4j.core.config.Configuration;
 import org.apache.logging.log4j.core.config.LoggerConfig;
-
-/**
-*
-* ╭━━━╮╱╱╱╱╱╭╮
-* ┃╭━╮┃╱╱╱╱╭╯╰╮
-* ┃╰━╯┣━━┳━┻╮╭╋╮
-* ┃╭╮╭┫╭╮┃╭╮┃┃┣┫
-* ┃┃┃╰┫╰╯┃╰╯┃╰┫┃
-* ╰╯╰━┻━━┻━━┻━┻╯
- */
 
 /**
  * Nukkit启动类，包含{@code main}函数。<br>
@@ -74,8 +63,7 @@ public class Nukkit {
         Object verbosity = options.valueOf("v");
         if (verbosity == null) {
             verbosity = options.valueOf("-verbosity");
-        }
-        if (verbosity != null) {
+        } else if (verbosity != null) {
 
             try {
                 Level level = Level.valueOf((String) verbosity);
