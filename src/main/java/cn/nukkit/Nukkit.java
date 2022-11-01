@@ -61,14 +61,15 @@ public class Nukkit {
         OptionSet options = parser.parse(args);
 
         Object verbosity = options.valueOf("v");
+        
         if (verbosity == null) {
             verbosity = options.valueOf("-verbosity");
-        } else if (verbosity != null) {
-
+        } else {
             try {
                 Level level = Level.valueOf((String) verbosity);
                 setLogLevel(level);
-            } catch (Exception e) {
+            } catch (Exception error) {
+                log.throwing(error);
             }
         }
 
