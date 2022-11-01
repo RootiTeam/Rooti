@@ -21,7 +21,7 @@ public class BinaryStream {
 
     public int offset;
     private byte[] buffer = new byte[32];
-    private int count;
+    protected int count;
 
     private static final int MAX_ARRAY_SIZE = Integer.MAX_VALUE - 8;
 
