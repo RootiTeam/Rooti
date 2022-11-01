@@ -16,10 +16,6 @@ import org.apache.logging.log4j.core.LoggerContext;
 import org.apache.logging.log4j.core.config.Configuration;
 import org.apache.logging.log4j.core.config.LoggerConfig;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Properties;
-import java.util.Scanner;
 /**
 *
 * ╭━━━╮╱╱╱╱╱╭╮
@@ -43,9 +39,9 @@ import java.util.Scanner;
 public class Nukkit {
 
     public final static String NAME = "Rooti-java";
-    public final static String VERSION = "1.0.1+alpha";
+    public final static String VERSION = "1.0.1";
     public final static String API_VERSION = "1.0.0";
-    public final static String CODENAME = "Rooti contributors & Nukkit";
+    public final static String CODENAME = "[RootiTeam]";
     @Deprecated
     public final static String MINECRAFT_VERSION = ProtocolInfo.MINECRAFT_VERSION;
     @Deprecated
@@ -56,7 +52,6 @@ public class Nukkit {
     public final static String PLUGIN_PATH = DATA_PATH + "plugins";
     public static final long START_TIME = System.currentTimeMillis();
     public static boolean ANSI = false;
-    public static boolean TITLE = true;
     public static boolean shortTitle = reqShortTitle();
     public static int DEBUG = 1;
 
@@ -70,8 +65,6 @@ public class Nukkit {
 
         // Define args
         OptionParser parser = new OptionParser();
-        OptionSpecBuilder disableAnsi = parser.accepts("enable-ansi", "Disables interactive console I/O");
-        OptionSpecBuilder enableTitle = parser.accepts("enable-title", "Enables title at the top of the window");
         parser.accepts("v", "Set verbosity of logging").withRequiredArg().ofType(String.class);
         parser.accepts("verbosity", "Set verbosity of logging").withRequiredArg().ofType(String.class);
 
@@ -88,24 +81,17 @@ public class Nukkit {
                 Level level = Level.valueOf((String) verbosity);
                 setLogLevel(level);
             } catch (Exception e) {
-                // ignore
             }
         }
 
         try {
-            if (TITLE) {
-                System.out.print((char) 0x1b + "]0;Starting Rooti Server For Minecraft: PE" + (char) 0x07);
-            }
+            log.info("Starting "+ NAME +" Server For Minecraft: PE");
             new Server(PATH, DATA_PATH, PLUGIN_PATH);
         } catch (Throwable t) {
             log.throwing(t);
         }
-
-        if (TITLE) {
-            System.out.print((char) 0x1b + "]0;Stopping Server..." + (char) 0x07);
-        }
+        
         log.info("Stopping other threads");
-
         for (Thread thread : java.lang.Thread.getAllStackTraces().keySet()) {
             if (!(thread instanceof InterruptibleThread)) {
                 continue;
@@ -117,12 +103,9 @@ public class Nukkit {
 
         ServerKiller killer = new ServerKiller(8);
         killer.start();
-
+        
+        log.info("Server stopped.");  
         LogManager.shutdown();
-
-        if (TITLE) {
-            System.out.print((char) 0x1b + "]0;Server Stopped" + (char) 0x07);
-        }
         System.exit(0);
     }
 
