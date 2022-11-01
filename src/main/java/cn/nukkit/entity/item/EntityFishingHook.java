@@ -225,7 +225,7 @@ public class EntityFishingHook extends EntityProjectile {
                 itemEntity.setOwner(player.getName());
                 itemEntity.spawnToAll();
 
-                player.addExperience(event.getExperience());
+                player.getLevel().dropExpOrb(player, event.getExperience());
             }
         }
         this.close();
