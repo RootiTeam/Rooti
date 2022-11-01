@@ -1,5 +1,7 @@
 package cn.nukkit.utils;
 
+import lombok.extern.log4j.Log4j2;
+
 /**
  * author: MagicDroidX
  * Nukkit Project
