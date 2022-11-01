@@ -893,7 +893,6 @@ public class Server {
 
     public void addOnlinePlayer(Player player) {
         this.playerList.put(player.getUniqueId(), player);
-        System.out.println(player.getSkin().getModel());
         this.updatePlayerListData(player.getUniqueId(), player.getId(), player.getPlayerInfo().getDisplayName(), player.getSkin());
     }
 
