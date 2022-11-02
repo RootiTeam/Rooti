@@ -1,4 +1,5 @@
 # Rooti
+[![Java CI](https://github.com/RootiTeam/Rooti/actions/workflows/gradle.yml/badge.svg?branch=main)](https://github.com/RootiTeam/Rooti/actions/workflows/gradle.yml)
 Software for Minecraft Pocket Edition 1.1.x forked Nukkit.
 
 Java 8 installation
