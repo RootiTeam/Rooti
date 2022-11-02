@@ -1,7 +1,7 @@
 package cn.nukkit.network.protocol;
 
-import lombok.ToString;
 import cn.nukkit.item.Item;
+import lombok.ToString;
 
 /**
  * author: MagicDroidX

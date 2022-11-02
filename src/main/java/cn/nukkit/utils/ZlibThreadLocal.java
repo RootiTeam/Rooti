@@ -1,6 +1,7 @@
 package cn.nukkit.utils;
 
 import cn.nukkit.nbt.stream.FastByteArrayOutputStream;
+
 import java.io.IOException;
 import java.util.zip.DataFormatException;
 import java.util.zip.Deflater;

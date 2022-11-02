@@ -7,6 +7,7 @@ import cn.nukkit.command.data.CommandParameter;
 import cn.nukkit.lang.TranslationContainer;
 import cn.nukkit.utils.TextFormat;
 
+import java.util.Arrays;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -30,12 +31,12 @@ public class HelpCommand extends VanillaCommand {
         if (!this.testPermission(sender)) {
             return true;
         }
-        String command = "";
+        StringBuilder command = new StringBuilder();
         int pageNumber = 1;
         int pageHeight = 5;
         if (args.length != 0) {
             try {
-                pageNumber = Integer.valueOf(args[args.length - 1]);
+                pageNumber = Integer.parseInt(args[args.length - 1]);
                 if (pageNumber <= 0) {
                     pageNumber = 1;
                 }
@@ -43,24 +44,24 @@ public class HelpCommand extends VanillaCommand {
                 String[] newargs = new String[args.length - 1];
                 System.arraycopy(args, 0, newargs, 0, newargs.length);
                 args = newargs;
-                /*if (args.length > 1) {
+                if (args.length > 1) {
                     args = Arrays.copyOfRange(args, 0, args.length - 2);
                 } else {
                     args = new String[0];
-                }*/
+                }
                 for (String arg : args) {
-                    if (!command.equals("")) {
-                        command += " ";
+                    if (!command.toString().equals("")) {
+                        command.append(" ");
                     }
-                    command += arg;
+                    command.append(arg);
                 }
             } catch (NumberFormatException e) {
                 pageNumber = 1;
                 for (String arg : args) {
-                    if (!command.equals("")) {
-                        command += " ";
+                    if (!command.toString().equals("")) {
+                        command.append(" ");
                     }
-                    command += arg;
+                    command.append(arg);
                 }
             }
         }
@@ -69,7 +70,7 @@ public class HelpCommand extends VanillaCommand {
             pageHeight = Integer.MAX_VALUE;
         }
 
-        if (command.equals("")) {
+        if (command.toString().equals("")) {
             Map<String, Command> commands = new TreeMap<>();
             for (Command cmd : sender.getServer().getCommandMap().getCommands().values()) {
                 if (cmd.testPermissionSilent(sender)) {
@@ -93,18 +94,18 @@ public class HelpCommand extends VanillaCommand {
 
             return true;
         } else {
-            Command cmd = sender.getServer().getCommandMap().getCommand(command.toLowerCase());
+            Command cmd = sender.getServer().getCommandMap().getCommand(command.toString().toLowerCase());
             if (cmd != null) {
                 if (cmd.testPermissionSilent(sender)) {
                     String message = TextFormat.YELLOW + "--------- " + TextFormat.WHITE + " Help: /" + cmd.getName() + TextFormat.YELLOW + " ---------\n";
                     message += TextFormat.GOLD + "Description: " + TextFormat.WHITE + cmd.getDescription() + "\n";
-                    String usage = "";
+                    StringBuilder usage = new StringBuilder();
                     String[] usages = cmd.getUsage().split("\n");
                     for (String u : usages) {
-                        if (!usage.equals("")) {
-                            usage += "\n" + TextFormat.WHITE;
+                        if (!usage.toString().equals("")) {
+                            usage.append("\n" + TextFormat.WHITE);
                         }
-                        usage += u;
+                        usage.append(u);
                     }
                     message += TextFormat.GOLD + "Usage: " + TextFormat.WHITE + usage + "\n";
                     sender.sendMessage(message);
@@ -112,7 +113,7 @@ public class HelpCommand extends VanillaCommand {
                 }
             }
 
-            sender.sendMessage(TextFormat.RED + "No help for " + command.toLowerCase());
+            sender.sendMessage(TextFormat.RED + "No help for " + command.toString().toLowerCase());
             return true;
         }
     }

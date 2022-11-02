@@ -29,8 +29,7 @@ public class VersionCommand extends VanillaCommand {
     public boolean execute(CommandSender sender, String commandLabel, String[] args) {
         if (!this.testPermission(sender)) {
             return true;
-        }
-        if (args.length == 0) {
+        } else if (args.length == 0) {
             sender.sendMessage(new TranslationContainer("nukkit.server.info.extended", new String[]{
                     sender.getServer().getName(),
                     sender.getServer().getNukkitVersion(),
@@ -64,8 +63,7 @@ public class VersionCommand extends VanillaCommand {
                 sender.sendMessage(TextFormat.DARK_GREEN + desc.getName() + TextFormat.WHITE + " version " + TextFormat.DARK_GREEN + desc.getVersion());
                 if (desc.getDescription() != null) {
                     sender.sendMessage(desc.getDescription());
-                }
-                if (desc.getWebsite() != null) {
+                } else if (desc.getWebsite() != null) {
                     sender.sendMessage("Website: " + desc.getWebsite());
                 }
                 List<String> authors = desc.getAuthors();

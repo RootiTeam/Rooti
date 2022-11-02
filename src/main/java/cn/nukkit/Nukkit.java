@@ -2,12 +2,11 @@ package cn.nukkit;
 
 import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.utils.ServerKiller;
-
 import com.google.common.base.Preconditions;
-import joptsimple.OptionParser;
-import joptsimple.OptionSet;
 import io.netty.util.internal.logging.InternalLoggerFactory;
 import io.netty.util.internal.logging.Log4J2LoggerFactory;
+import joptsimple.OptionParser;
+import joptsimple.OptionSet;
 import lombok.extern.log4j.Log4j2;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;

@@ -36,11 +36,11 @@ import cn.nukkit.plugin.Plugin;
 import cn.nukkit.scheduler.PluginTask;
 import cn.nukkit.scheduler.TaskHandler;
 
-import static co.aikar.timings.TimingIdentifier.DEFAULT_GROUP;
-
 import java.util.HashSet;
 import java.util.Queue;
 import java.util.Set;
+
+import static co.aikar.timings.TimingIdentifier.DEFAULT_GROUP;
 
 public final class Timings {
     private static boolean timingsEnabled = false;

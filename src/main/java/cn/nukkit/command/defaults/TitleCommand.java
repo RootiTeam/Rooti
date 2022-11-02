@@ -52,8 +52,7 @@ public class TitleCommand extends VanillaCommand {
     public boolean execute(CommandSender sender, String commandLabel, String[] args) {
         if (!this.testPermission(sender)) {
             return true;
-        }
-        if (args.length < 2) {
+        } else if (args.length < 2) {
             sender.sendMessage(new TranslationContainer("commands.generic.usage", this.usageMessage));
             return false;
         }
@@ -62,9 +61,7 @@ public class TitleCommand extends VanillaCommand {
         if (player == null) {
             sender.sendMessage(new TranslationContainer(TextFormat.RED + "%commands.generic.player.notFound"));
             return true;
-        }
-
-        if (args.length == 2) {
+        } else if (args.length == 2) {
             switch (args[1].toLowerCase()) {
                 case "clear":
                     player.clearTitle();

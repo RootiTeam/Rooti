@@ -27,11 +27,10 @@ public class SpawnpointCommand extends VanillaCommand {
 
     @Override
     public boolean execute(CommandSender sender, String commandLabel, String[] args) {
+        Player target;
         if (!this.testPermission(sender)) {
             return true;
-        }
-        Player target;
-        if (args.length == 0) {
+        } else if (args.length == 0) {
             if (sender instanceof Player) {
                 target = (Player) sender;
             } else {

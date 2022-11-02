@@ -23,33 +23,30 @@ public class MeCommand extends VanillaCommand {
 
     @Override
     public boolean execute(CommandSender sender, String commandLabel, String[] args) {
+        String name;
+
         if (!this.testPermission(sender)) {
             return true;
-        }
-
-        if (args.length == 0) {
+        } else if (args.length == 0) {
             sender.sendMessage(new TranslationContainer("commands.generic.usage", this.usageMessage));
 
             return false;
-        }
-
-        String name;
-        if (sender instanceof Player) {
+        } else if (sender instanceof Player) {
             name = ((Player) sender).getPlayerInfo().getDisplayName();
         } else {
             name = sender.getName();
         }
 
-        String msg = "";
+        StringBuilder msg = new StringBuilder();
         for (String arg : args) {
-            msg += arg + " ";
+            msg.append(arg).append(" ");
         }
 
         if (msg.length() > 0) {
-            msg = msg.substring(0, msg.length() - 1);
+            msg = new StringBuilder(msg.substring(0, msg.length() - 1));
         }
 
-        sender.getServer().broadcastMessage(new TranslationContainer("chat.type.emote", new String[]{name, TextFormat.WHITE + msg}));
+        sender.getServer().broadcastMessage(new TranslationContainer("chat.type.emote", new String[]{name, TextFormat.WHITE + msg.toString()}));
 
         return true;
     }

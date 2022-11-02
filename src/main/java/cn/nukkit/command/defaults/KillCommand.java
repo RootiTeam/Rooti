@@ -29,12 +29,10 @@ public class KillCommand extends VanillaCommand {
     public boolean execute(CommandSender sender, String commandLabel, String[] args) {
         if (!this.testPermission(sender)) {
             return true;
-        }
-        if (args.length >= 2) {
+        } else if (args.length >= 2) {
             sender.sendMessage(new TranslationContainer("commands.generic.usage", this.usageMessage));
             return false;
-        }
-        if (args.length == 1) {
+        } else if (args.length == 1) {
             if (!sender.hasPermission("nukkit.command.kill.other")) {
                 sender.sendMessage(new TranslationContainer(TextFormat.RED + "%commands.generic.permission"));
                 return true;
@@ -53,8 +51,7 @@ public class KillCommand extends VanillaCommand {
                 sender.sendMessage(new TranslationContainer(TextFormat.RED + "%commands.generic.player.notFound"));
             }
             return true;
-        }
-        if (sender instanceof Player) {
+        } else if (sender instanceof Player) {
             if (!sender.hasPermission("nukkit.command.kill.self")) {
                 sender.sendMessage(new TranslationContainer(TextFormat.RED + "%commands.generic.permission"));
                 return true;

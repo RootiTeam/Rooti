@@ -5,22 +5,16 @@ import cn.nukkit.event.plugin.PluginDisableEvent;
 import cn.nukkit.event.plugin.PluginEnableEvent;
 import cn.nukkit.utils.TextFormat;
 import cn.nukkit.utils.Utils;
+
+import javax.tools.DiagnosticListener;
+import javax.tools.JavaCompiler;
+import javax.tools.JavaCompiler.CompilationTask;
+import javax.tools.StandardJavaFileManager;
 import java.io.File;
 import java.io.Writer;
 import java.nio.charset.Charset;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Pattern;
-import javax.tools.DiagnosticListener;
-import javax.tools.JavaCompiler;
-import javax.tools.StandardJavaFileManager;
-import javax.tools.JavaCompiler.CompilationTask;
 
 public class SourcePluginLoader implements PluginLoader {
    private Server server = null;

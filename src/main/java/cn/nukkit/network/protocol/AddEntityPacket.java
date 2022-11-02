@@ -1,9 +1,9 @@
 package cn.nukkit.network.protocol;
 
 import cn.nukkit.entity.Attribute;
-import cn.nukkit.entity.mob.EntitySkeleton;
-import cn.nukkit.entity.item.EntityFishingHook;
 import cn.nukkit.entity.data.EntityMetadata;
+import cn.nukkit.entity.item.EntityFishingHook;
+import cn.nukkit.entity.mob.EntitySkeleton;
 import cn.nukkit.utils.Binary;
 import com.google.common.collect.ImmutableMap;
 import lombok.ToString;

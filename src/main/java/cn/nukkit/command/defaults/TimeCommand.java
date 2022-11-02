@@ -40,9 +40,7 @@ public class TimeCommand extends VanillaCommand {
             sender.sendMessage(new TranslationContainer("commands.generic.usage", this.usageMessage));
 
             return false;
-        }
-
-        if ("start".equals(args[0])) {
+        } else if ("start".equals(args[0])) {
             if (!sender.hasPermission("nukkit.command.time.start")) {
                 sender.sendMessage(new TranslationContainer(TextFormat.RED + "%commands.generic.permission"));
 
@@ -82,16 +80,11 @@ public class TimeCommand extends VanillaCommand {
             }
             sender.sendMessage(new TranslationContainer("commands.time.query", String.valueOf(level.getTime())));
             return true;
-        }
-
-
-        if (args.length < 2) {
+        } else if (args.length < 2) {
             sender.sendMessage(new TranslationContainer("commands.generic.usage", this.usageMessage));
 
             return false;
-        }
-
-        if ("set".equals(args[0])) {
+        } else if ("set".equals(args[0])) {
             if (!sender.hasPermission("nukkit.command.time.set")) {
                 sender.sendMessage(new TranslationContainer(TextFormat.RED + "%commands.generic.permission"));
 

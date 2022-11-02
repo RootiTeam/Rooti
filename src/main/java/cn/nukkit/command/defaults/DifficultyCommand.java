@@ -32,9 +32,7 @@ public class DifficultyCommand extends VanillaCommand {
     public boolean execute(CommandSender sender, String commandLabel, String[] args) {
         if (!this.testPermission(sender)) {
             return true;
-        }
-
-        if (args.length != 1) {
+        } else if (args.length != 1) {
             sender.sendMessage(new TranslationContainer("commands.generic.usage", this.usageMessage));
             return false;
         }
@@ -43,9 +41,7 @@ public class DifficultyCommand extends VanillaCommand {
 
         if (sender.getServer().isHardcore()) {
             difficulty = 3;
-        }
-
-        if (difficulty != -1) {
+        } else if (difficulty != -1) {
             sender.getServer().setPropertyInt("difficulty", difficulty);
 
             SetDifficultyPacket pk = new SetDifficultyPacket();

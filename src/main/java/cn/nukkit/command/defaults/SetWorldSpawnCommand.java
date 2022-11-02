@@ -26,12 +26,11 @@ public class SetWorldSpawnCommand extends VanillaCommand {
 
     @Override
     public boolean execute(CommandSender sender, String commandLabel, String[] args) {
-        if (!this.testPermission(sender)) {
-            return true;
-        }
         Level level;
         Vector3 pos;
-        if (args.length == 0) {
+        if (!this.testPermission(sender)) {
+            return true;
+        } else if (args.length == 0) {
             if (sender instanceof Player) {
                 level = ((Player) sender).getLevel();
                 pos = ((Player) sender).round();

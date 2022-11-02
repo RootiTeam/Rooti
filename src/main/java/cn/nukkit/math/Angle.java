@@ -1,6 +1,6 @@
 package cn.nukkit.math;
 
-import static java.lang.Math.*;
+import static java.lang.Math.PI;
 
 /**
  * Copyright 2017 lmlstarqaq

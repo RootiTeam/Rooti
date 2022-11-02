@@ -1,8 +1,6 @@
 package cn.nukkit.level.generator.biome;
 
 import cn.nukkit.block.Block;
-import cn.nukkit.block.BlockDirt;
-import cn.nukkit.block.BlockClay;
 import cn.nukkit.block.BlockSand;
 import cn.nukkit.block.BlockStone;
 

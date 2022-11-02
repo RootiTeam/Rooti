@@ -1,7 +1,7 @@
 package cn.nukkit.network.protocol;
 
-import lombok.ToString;
 import cn.nukkit.math.BlockVector3;
+import lombok.ToString;
 
 /**
  * @author Nukkit Project Team

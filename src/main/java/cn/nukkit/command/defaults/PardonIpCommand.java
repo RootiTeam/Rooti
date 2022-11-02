@@ -27,9 +27,7 @@ public class PardonIpCommand extends VanillaCommand {
     public boolean execute(CommandSender sender, String commandLabel, String[] args) {
         if (!this.testPermission(sender)) {
             return true;
-        }
-
-        if (args.length != 1) {
+        } else if (args.length != 1) {
             sender.sendMessage(new TranslationContainer("commands.generic.usage", this.usageMessage));
 
             return false;

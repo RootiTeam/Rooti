@@ -18,12 +18,10 @@ public class SeedCommand extends VanillaCommand {
 
     @Override
     public boolean execute(CommandSender sender, String commandLabel, String[] args) {
+        long seed;
         if (!this.testPermission(sender)) {
             return true;
-        }
-
-        long seed;
-        if (sender instanceof Player) {
+        } else if (sender instanceof Player) {
             seed = ((Player) sender).getLevel().getSeed();
         } else {
             seed = sender.getServer().getDefaultLevel().getSeed();

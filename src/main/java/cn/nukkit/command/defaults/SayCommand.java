@@ -24,17 +24,14 @@ public class SayCommand extends VanillaCommand {
 
     @Override
     public boolean execute(CommandSender sender, String commandLabel, String[] args) {
+        String senderString;
+
         if (!this.testPermission(sender)) {
             return true;
-        }
-
-        if (args.length == 0) {
+        } else if (args.length == 0) {
             sender.sendMessage(new TranslationContainer("commands.generic.usage", this.usageMessage));
             return false;
-        }
-
-        String senderString;
-        if (sender instanceof Player) {
+        } else if (sender instanceof Player) {
             senderString = ((Player) sender).getPlayerInfo().getDisplayName();
         } else if (sender instanceof ConsoleCommandSender) {
             senderString = "Server";

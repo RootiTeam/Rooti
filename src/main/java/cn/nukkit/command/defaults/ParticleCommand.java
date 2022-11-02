@@ -38,18 +38,15 @@ public class ParticleCommand extends VanillaCommand {
 
     @Override
     public boolean execute(CommandSender sender, String commandLabel, String[] args) {
+        Level level;
+
         if (!this.testPermission(sender)) {
             return true;
-        }
-
-        if (args.length < 7) {
+        } else if (args.length < 7) {
             sender.sendMessage(new TranslationContainer("commands.generic.usage", this.usageMessage));
 
             return true;
-        }
-
-        Level level;
-        if (sender instanceof Player) {
+        } else if (sender instanceof Player) {
             level = ((Player) sender).getLevel();
         } else {
             level = sender.getServer().getDefaultLevel();

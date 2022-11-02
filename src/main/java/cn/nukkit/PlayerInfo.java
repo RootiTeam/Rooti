@@ -4,9 +4,9 @@ package cn.nukkit;
  * Created by ddosnikgit on 01.11.2022.
  */
 
-import cn.nukkit.utils.TextFormat;
-import cn.nukkit.utils.Binary;
 import cn.nukkit.network.protocol.LoginPacket;
+import cn.nukkit.utils.Binary;
+import cn.nukkit.utils.TextFormat;
 
 import java.util.UUID;
 

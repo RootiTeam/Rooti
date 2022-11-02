@@ -25,9 +25,7 @@ public class TimingsCommand extends VanillaCommand {
     public boolean execute(CommandSender sender, String commandLabel, String[] args) {
         if (!this.testPermission(sender)) {
             return true;
-        }
-
-        if (args.length != 1) {
+        } else if (args.length != 1) {
             sender.sendMessage(new TranslationContainer("commands.generic.usage", usageMessage));
             return true;
         }
@@ -43,9 +41,7 @@ public class TimingsCommand extends VanillaCommand {
             Timings.setTimingsEnabled(false);
             sender.sendMessage(new TranslationContainer("nukkit.command.timings.disable"));
             return true;
-        }
-
-        if (!Timings.isTimingsEnabled()) {
+        } else if (!Timings.isTimingsEnabled()) {
             sender.sendMessage(new TranslationContainer("nukkit.command.timings.timingsDisabled"));
             return true;
         }

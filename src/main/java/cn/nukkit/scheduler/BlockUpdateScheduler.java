@@ -6,11 +6,8 @@ import cn.nukkit.math.AxisAlignedBB;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.utils.BlockUpdateEntry;
 import com.google.common.collect.Maps;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.Set;
+
+import java.util.*;
 
 public class BlockUpdateScheduler {
     private final Level level;

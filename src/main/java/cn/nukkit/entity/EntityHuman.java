@@ -2,12 +2,12 @@ package cn.nukkit.entity;
 
 import cn.nukkit.Player;
 import cn.nukkit.entity.data.IntPositionEntityData;
-import cn.nukkit.network.protocol.SetEntityLinkPacket;
 import cn.nukkit.entity.data.Skin;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.AddPlayerPacket;
 import cn.nukkit.network.protocol.RemoveEntityPacket;
+import cn.nukkit.network.protocol.SetEntityLinkPacket;
 import cn.nukkit.utils.Utils;
 
 import java.nio.charset.StandardCharsets;
