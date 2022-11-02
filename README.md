@@ -1,5 +1,6 @@
 # Rooti
 [![Java CI](https://github.com/RootiTeam/Rooti/actions/workflows/gradle.yml/badge.svg?branch=main)](https://github.com/RootiTeam/Rooti/actions/workflows/gradle.yml)
+<a href="https://github.com/RootiTeam/Rooti/releases/latest"><img alt="Latest release" src="https://img.shields.io/github/v/release/RootiTeam/Rooti?label=release&sort=semver"></a>
 
 Software for Minecraft Pocket Edition 1.1.x forked Nukkit.
 
