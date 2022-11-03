@@ -49,6 +49,7 @@ public class Explosion {
      * @return bool
      * @deprecated
      */
+    @Deprecated
     public boolean explode() {
         if (explodeA()) {
             return explodeB();
