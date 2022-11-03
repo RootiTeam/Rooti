@@ -14,6 +14,8 @@ import org.apache.logging.log4j.core.LoggerContext;
 import org.apache.logging.log4j.core.config.Configuration;
 import org.apache.logging.log4j.core.config.LoggerConfig;
 
+import java.lang.management.ManagementFactory;
+
 /**
  * Nukkit启动类，包含{@code main}函数。<br>
  * The launcher class of Nukkit, including the {@code main} function.
@@ -75,10 +77,12 @@ public class Nukkit {
 
         try {
             log.info("Starting "+ NAME +" Server For Minecraft: PE");
+            log.info("Running on java version: [" + ManagementFactory.getRuntimeMXBean().getVmVersion() + "]");
             new Server(PATH, DATA_PATH, PLUGIN_PATH);
         } catch (Throwable t) {
             log.throwing(t);
         }
+
         
         log.info("Stopping other threads");
         for (Thread thread : java.lang.Thread.getAllStackTraces().keySet()) {
