@@ -27,7 +27,7 @@ public class ServerHandler {
 
     public void sendEncapsulated(String identifier, EncapsulatedPacket packet, int flags) {
         byte[] buffer = Binary.appendBytes(
-                RakNet.PACKET_ENCAPSULATED,
+                ITCProtocol.PACKET_ENCAPSULATED,
                 new byte[]{(byte) (identifier.length() & 0xff)},
                 identifier.getBytes(StandardCharsets.UTF_8),
                 new byte[]{(byte) (flags & 0xff)},
@@ -38,7 +38,7 @@ public class ServerHandler {
 
     public void sendRaw(String address, int port, byte[] payload) {
         byte[] buffer = Binary.appendBytes(
-                RakNet.PACKET_RAW,
+                ITCProtocol.PACKET_RAW,
                 new byte[]{(byte) (address.length() & 0xff)},
                 address.getBytes(StandardCharsets.UTF_8),
                 Binary.writeShort(port),
@@ -49,7 +49,7 @@ public class ServerHandler {
 
     public void closeSession(String identifier, String reason) {
         byte[] buffer = Binary.appendBytes(
-                RakNet.PACKET_CLOSE_SESSION,
+                ITCProtocol.PACKET_CLOSE_SESSION,
                 new byte[]{(byte) (identifier.length() & 0xff)},
                 identifier.getBytes(StandardCharsets.UTF_8),
                 new byte[]{(byte) (reason.length() & 0xff)},
@@ -60,7 +60,7 @@ public class ServerHandler {
 
     public void sendOption(String name, String value) {
         byte[] buffer = Binary.appendBytes(
-                RakNet.PACKET_SET_OPTION,
+                ITCProtocol.PACKET_SET_OPTION,
                 new byte[]{(byte) (name.length() & 0xff)},
                 name.getBytes(StandardCharsets.UTF_8),
                 value.getBytes(StandardCharsets.UTF_8)
@@ -70,7 +70,7 @@ public class ServerHandler {
 
     public void blockAddress(String address, int timeout) {
         byte[] buffer = Binary.appendBytes(
-                RakNet.PACKET_BLOCK_ADDRESS,
+                ITCProtocol.PACKET_BLOCK_ADDRESS,
                 new byte[]{(byte) (address.length() & 0xff)},
                 address.getBytes(StandardCharsets.UTF_8),
                 Binary.writeInt(timeout)
@@ -80,7 +80,7 @@ public class ServerHandler {
     
     public void unblockAddress(String address) {
         byte[] buffer = Binary.appendBytes(
-                RakNet.PACKET_UNBLOCK_ADDRESS,
+                ITCProtocol.PACKET_UNBLOCK_ADDRESS,
                 new byte[]{(byte) (address.length() & 0xff)},
                 address.getBytes(StandardCharsets.UTF_8)
         );
@@ -88,7 +88,7 @@ public class ServerHandler {
     }
 
     public void shutdown() {
-        this.server.pushMainToThreadPacket(new byte[]{RakNet.PACKET_SHUTDOWN});
+        this.server.pushMainToThreadPacket(new byte[]{ITCProtocol.PACKET_SHUTDOWN});
         this.server.shutdown();
         synchronized (this) {
             try {
@@ -106,12 +106,12 @@ public class ServerHandler {
 
     public void emergencyShutdown() {
         this.server.shutdown();
-        this.server.pushMainToThreadPacket(new byte[]{RakNet.PACKET_EMERGENCY_SHUTDOWN});
+        this.server.pushMainToThreadPacket(new byte[]{ITCProtocol.PACKET_EMERGENCY_SHUTDOWN});
     }
 
     protected void invalidSession(String identifier) {
         byte[] buffer = Binary.appendBytes(
-                RakNet.PACKET_INVALID_SESSION,
+                ITCProtocol.PACKET_INVALID_SESSION,
                 new byte[]{(byte) (identifier.length() & 0xff)},
                 identifier.getBytes(StandardCharsets.UTF_8)
         );
@@ -123,14 +123,14 @@ public class ServerHandler {
         if (packet != null && packet.length > 0) {
             byte id = packet[0];
             int offset = 1;
-            if (id == RakNet.PACKET_ENCAPSULATED) {
+            if (id == ITCProtocol.PACKET_ENCAPSULATED) {
                 int len = packet[offset++];
                 String identifier = new String(Binary.subBytes(packet, offset, len), StandardCharsets.UTF_8);
                 offset += len;
                 int flags = packet[offset++];
                 byte[] buffer = Binary.subBytes(packet, offset);
                 this.instance.handleEncapsulated(identifier, EncapsulatedPacket.fromBinary(buffer, true), flags);
-            } else if (id == RakNet.PACKET_RAW) {
+            } else if (id == ITCProtocol.PACKET_RAW) {
                 int len = packet[offset++];
                 String address = new String(Binary.subBytes(packet, offset, len), StandardCharsets.UTF_8);
                 offset += len;
@@ -138,13 +138,13 @@ public class ServerHandler {
                 offset += 2;
                 byte[] payload = Binary.subBytes(packet, offset);
                 this.instance.handleRaw(address, port, payload);
-            } else if (id == RakNet.PACKET_SET_OPTION) {
+            } else if (id == ITCProtocol.PACKET_SET_OPTION) {
                 int len = packet[offset++];
                 String name = new String(Binary.subBytes(packet, offset, len), StandardCharsets.UTF_8);
                 offset += len;
                 String value = new String(Binary.subBytes(packet, offset), StandardCharsets.UTF_8);
                 this.instance.handleOption(name, value);
-            } else if (id == RakNet.PACKET_OPEN_SESSION) {
+            } else if (id == ITCProtocol.PACKET_OPEN_SESSION) {
                 int len = packet[offset++];
                 String identifier = new String(Binary.subBytes(packet, offset, len), StandardCharsets.UTF_8);
                 offset += len;
@@ -155,18 +155,18 @@ public class ServerHandler {
                 offset += 2;
                 long clientID = Binary.readLong(Binary.subBytes(packet, offset, 8));
                 this.instance.openSession(identifier, address, port, clientID);
-            } else if (id == RakNet.PACKET_CLOSE_SESSION) {
+            } else if (id == ITCProtocol.PACKET_CLOSE_SESSION) {
                 int len = packet[offset++];
                 String identifier = new String(Binary.subBytes(packet, offset, len), StandardCharsets.UTF_8);
                 offset += len;
                 len = packet[offset++];
                 String reason = new String(Binary.subBytes(packet, offset, len), StandardCharsets.UTF_8);
                 this.instance.closeSession(identifier, reason);
-            } else if (id == RakNet.PACKET_INVALID_SESSION) {
+            } else if (id == ITCProtocol.PACKET_INVALID_SESSION) {
                 int len = packet[offset++];
                 String identifier = new String(Binary.subBytes(packet, offset, len), StandardCharsets.UTF_8);
                 this.instance.closeSession(identifier, "Invalid session");
-            } else if (id == RakNet.PACKET_ACK_NOTIFICATION) {
+            } else if (id == ITCProtocol.PACKET_ACK_NOTIFICATION) {
                 int len = packet[offset++];
                 String identifier = new String(Binary.subBytes(packet, offset, len), StandardCharsets.UTF_8);
                 offset += len;

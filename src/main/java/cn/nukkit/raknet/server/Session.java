@@ -57,6 +57,9 @@ public class Session {
 
     private final Map<Integer, DataPacket> recoveryQueue = new TreeMap<>();
 
+    private volatile long currentPingTime = -1;
+    private volatile long lastPingTime = -1;
+    private volatile long lastPongTime = -1;
     private final Map<Integer, Map<Integer, EncapsulatedPacket>> splitPackets = new HashMap<>();
 
     private final Map<Integer, Map<Integer, Integer>> needACK = new TreeMap<>();
@@ -109,6 +112,7 @@ public class Session {
 
             return;
         }
+
         this.isActive = false;
 
         if (!this.ACKQueue.isEmpty()) {
@@ -380,6 +384,13 @@ public class Session {
         }
 
         byte id = packet.buffer[0];
+
+        if (id == 9 && packet.reliability == 0) {
+            this.sessionManager.getLogger().debug(this.address + " failed login packets validation.");
+            this.sessionManager.blockAddress(this.address, 15);
+            return;
+        }
+
         if ((id & 0xff) < 0x80) { //internal data packet
             if (state == STATE_CONNECTING_2) {
                 if (id == CLIENT_CONNECT_DataPacket.ID) {
@@ -438,14 +449,19 @@ public class Session {
                     PONG_DataPacket dataPacket = new PONG_DataPacket();
                     dataPacket.buffer = packet.buffer;
                     dataPacket.decode();
+                    this.onConnectedPong(packet.buffer);
 
                     if (state == STATE_CONNECTED) {
+                        this.sendConnectedPing(dataPacket.pingID, packet);
+                    }
+
+                  /*  if (state == STATE_CONNECTED) {
                         PING_DataPacket pingPacket = new PING_DataPacket();
                         pingPacket.pingID = (System.currentTimeMillis() - dataPacket.pingID) / 10;
                         pingPacket.encode();
                         packet.buffer = pingPacket.buffer;
                         this.sessionManager.streamEncapsulated(this, packet);
-                    }
+                    }*/
                 }
             }
         } else if (state == STATE_CONNECTED) {
@@ -453,6 +469,23 @@ public class Session {
         } else {
             //this.sessionManager.getLogger().notice("Received packet before connection: "+Binary.bytesToHexString(packet.buffer));
         }
+    }
+
+    private void onConnectedPong(byte[] buffer) {
+        long pingTime = Binary.readLong(buffer);
+        if (this.currentPingTime == pingTime) {
+            this.lastPingTime = this.currentPingTime;
+            this.lastPongTime = System.currentTimeMillis();
+        }
+    }
+
+    private void sendConnectedPing(long pingTime, EncapsulatedPacket packet) {
+        PING_DataPacket pingPacket = new PING_DataPacket();
+        pingPacket.pingID = (System.currentTimeMillis() - pingTime) / 10;
+        pingPacket.encode();
+        packet.buffer = pingPacket.buffer;
+        this.sessionManager.streamEncapsulated(this, packet);
+        this.currentPingTime = pingTime;
     }
 
     public void handlePacket(Packet packet) throws Exception {
@@ -504,6 +537,7 @@ public class Session {
                                     }
                                 }
                             }
+                            //this.pingAverage.add(System.currentTimeMillis() - this.recoveryQueue.get(seq).sendTime);
                             this.recoveryQueue.remove(seq);
                         }
                     }
@@ -548,5 +582,9 @@ public class Session {
         byte[] data = new byte[]{0x60, 0x00, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x15}; //CLIENT_DISCONNECT packet 0x15
         this.addEncapsulatedToQueue(EncapsulatedPacket.fromBinary(data));
         this.sessionManager = null;
+    }
+
+    public long getPing() {
+        return this.lastPongTime - this.lastPingTime;
     }
 }

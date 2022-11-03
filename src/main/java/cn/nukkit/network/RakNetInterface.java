@@ -15,6 +15,7 @@ import cn.nukkit.raknet.protocol.packet.PING_DataPacket;
 import cn.nukkit.raknet.server.RakNetServer;
 import cn.nukkit.raknet.server.ServerHandler;
 import cn.nukkit.raknet.server.ServerInstance;
+import cn.nukkit.raknet.utils.InternetAddress;
 import cn.nukkit.utils.Binary;
 import cn.nukkit.utils.MainLogger;
 import cn.nukkit.utils.Utils;
@@ -56,7 +57,9 @@ public class RakNetInterface implements ServerInstance, AdvancedSourceInterface 
     public RakNetInterface(Server server) {
         this.server = server;
 
-        this.raknet = new RakNetServer(this.server.getPort(), this.server.getIp().equals("") ? "0.0.0.0" : this.server.getIp());
+        this.raknet = new RakNetServer(
+            new InternetAddress(this.server.getIp().equals("") ? "0.0.0.0" : this.server.getIp(), this.server.getPort(), 4)
+        );
         this.handler = new ServerHandler(this.raknet, this);
     }
 
@@ -203,7 +206,7 @@ public class RakNetInterface implements ServerInstance, AdvancedSourceInterface 
     public void sendRawPacket(String address, int port, byte[] payload) {
         this.handler.sendRaw(address, port, payload);
     }
-
+    
     @Override
     public void notifyACK(String identifier, int identifierACK) {
         // TODO: Better ACK notification implementation!

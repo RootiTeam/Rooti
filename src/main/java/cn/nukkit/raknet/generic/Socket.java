@@ -1,6 +1,7 @@
-package cn.nukkit.raknet.server;
+package cn.nukkit.raknet.generic;
 
 import cn.nukkit.utils.MainLogger;
+import cn.nukkit.raknet.utils.InternetAddress;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
@@ -16,27 +17,21 @@ import java.net.InetSocketAddress;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
- * author: MagicDroidX
- * Nukkit Project
+ * Created by @ddosnikgit on 3-11-2022.
+ * @link https://github.com/RootiTeam/Rooti
  */
-public class UDPServerSocket extends ChannelInboundHandlerAdapter {
+public class Socket extends ChannelInboundHandlerAdapter{
 
-    protected final MainLogger logger;
+	protected final MainLogger logger;
+	protected InternetAddress bindAddress;
     protected Bootstrap bootstrap;
     protected EventLoopGroup group;
     protected Channel channel;
 
     protected ConcurrentLinkedQueue<DatagramPacket> packets = new ConcurrentLinkedQueue<>();
 
-    public UDPServerSocket(MainLogger logger) {
-        this(logger, 19132, "0.0.0.0");
-    }
-
-    public UDPServerSocket(MainLogger logger, int port) {
-        this(logger, port, "0.0.0.0");
-    }
-
-    public UDPServerSocket(MainLogger logger, int port, String interfaz) {
+    public Socket(MainLogger logger, InternetAddress bindAddress) {
+    	this.bindAddress = bindAddress;
         this.logger = logger;
         try {
             bootstrap = new Bootstrap();
@@ -45,12 +40,19 @@ public class UDPServerSocket extends ChannelInboundHandlerAdapter {
                     .group(group)
                     .channel(NioDatagramChannel.class)
                     .handler(this);
-            channel = bootstrap.bind(interfaz, port).sync().channel();
+            channel = bootstrap.bind(bindAddress.getIp(), bindAddress.getPort()).sync().channel();
         } catch (Exception e) {
-            this.logger.critical("**** FAILED TO BIND TO " + interfaz + ":" + port + "!");
-            this.logger.critical("Perhaps a server is already running on that port?");
+            this.logger.critical("Failed to bind socket: Something else is already running on" + bindAddress.toString());
             System.exit(1);
         }
+    }
+
+    public InternetAddress getBindAddress() {
+    	return this.bindAddress;
+    }
+
+    public Channel getSocket() {
+    	return this.channel;
     }
 
     public void close() {

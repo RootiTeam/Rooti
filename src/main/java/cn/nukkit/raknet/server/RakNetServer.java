@@ -2,6 +2,8 @@ package cn.nukkit.raknet.server;
 
 import cn.nukkit.Server;
 import cn.nukkit.utils.MainLogger;
+import cn.nukkit.raknet.generic.Socket;
+import cn.nukkit.raknet.utils.InternetAddress;
 import lombok.extern.log4j.Log4j2;
 
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -12,26 +14,15 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  */
 @Log4j2
 public class RakNetServer extends Thread {
-    protected final int port;
-    protected String interfaz;
+    protected InternetAddress bindAddress;
 
     protected ConcurrentLinkedQueue<byte[]> externalQueue;
     protected ConcurrentLinkedQueue<byte[]> internalQueue;
 
     protected boolean shutdown;
 
-
-    public RakNetServer(int port) {
-        this(port, "0.0.0.0");
-    }
-
-    public RakNetServer(int port, String interfaz) {
-        this.port = port;
-        if (port < 1 || port > 65536) {
-            throw new IllegalArgumentException("Invalid port range");
-        }
-
-        this.interfaz = interfaz;
+    public RakNetServer(InternetAddress bindAddress) {
+        this.bindAddress = bindAddress;
 
         this.externalQueue = new ConcurrentLinkedQueue<>();
         this.internalQueue = new ConcurrentLinkedQueue<>();
@@ -47,12 +38,8 @@ public class RakNetServer extends Thread {
         this.shutdown = true;
     }
 
-    public int getPort() {
-        return port;
-    }
-
-    public String getInterface() {
-        return interfaz;
+    public InternetAddress getAddress() {
+        return bindAddress;
     }
 
     public MainLogger getLogger() {
@@ -95,7 +82,7 @@ public class RakNetServer extends Thread {
     public void run() {
         this.setName("RakNet Thread #" + Thread.currentThread().getId());
         Runtime.getRuntime().addShutdownHook(new ShutdownHandler());
-        UDPServerSocket socket = new UDPServerSocket(this.getLogger(), port, this.interfaz);
+        Socket socket = new Socket(this.getLogger(), this.bindAddress);
         try {
             new SessionManager(this, socket);
         } catch (Exception e) {
