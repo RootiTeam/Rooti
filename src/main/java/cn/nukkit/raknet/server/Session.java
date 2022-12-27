@@ -36,7 +36,7 @@ public class Session {
     private final int port;
     private int state = STATE_UNCONNECTED;
     //private List<EncapsulatedPacket> preJoinQueue = new ArrayList<>();
-    private int mtuSize = (int) Server.getInstance().getRootiConfig("network.min-mtu", 548); //Min size
+    private int mtuSize = (int) Server.getInstance().getConfigGroup().getAdvancedProperty("network.min-mtu", 548); //Min size
     private long id = 0;
     private int splitID = 0;
 

@@ -42,7 +42,7 @@ public class DifficultyCommand extends VanillaCommand {
         if (sender.getServer().isHardcore()) {
             difficulty = 3;
         } else if (difficulty != -1) {
-            sender.getServer().setPropertyInt("difficulty", difficulty);
+            sender.getServer().getConfigGroup().setConfigInt("difficulty", difficulty);
 
             SetDifficultyPacket pk = new SetDifficultyPacket();
             pk.difficulty = sender.getServer().getDifficulty();

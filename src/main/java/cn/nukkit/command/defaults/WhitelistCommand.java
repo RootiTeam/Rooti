@@ -51,12 +51,12 @@ public class WhitelistCommand extends VanillaCommand {
 
                     return true;
                 case "on":
-                    sender.getServer().setPropertyBoolean("white-list", true);
+                    sender.getServer().getConfigGroup().setConfigBoolean("white-list", true);
                     Command.broadcastCommandMessage(sender, new TranslationContainer("commands.whitelist.enabled"));
 
                     return true;
                 case "off":
-                    sender.getServer().setPropertyBoolean("white-list", false);
+                    sender.getServer().getConfigGroup().setConfigBoolean("white-list", false);
                     Command.broadcastCommandMessage(sender, new TranslationContainer("commands.whitelist.disabled"));
 
                     return true;

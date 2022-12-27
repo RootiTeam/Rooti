@@ -176,7 +176,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     protected int inAirTicks = 0;
     protected int startAirTicks = 5;
 
-    private final int maxPacketsPerSecond = (int) Server.getInstance().getRootiConfig("network.max-pps", 150);
+    private final int maxPacketsPerSecond = (int) Server.getInstance().getConfigGroup().getAdvancedProperty("network.max-pps", 150);
 
     protected AdventureSettings adventureSettings;
 
@@ -523,8 +523,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         this.port = port;
         this.clientID = clientID;
         this.loaderId = Level.generateChunkLoaderId(this);
-        this.chunksPerTick = (int) this.server.getConfig("chunk-sending.per-tick", 4);
-        this.spawnThreshold = (int) this.server.getConfig("chunk-sending.spawn-threshold", 56);
+        this.chunksPerTick = this.server.getConfigGroup().getPropertyInt("chunk-sending.per-tick", 4);
+        this.spawnThreshold = this.server.getConfigGroup().getPropertyInt("chunk-sending.spawn-threshold", 56);
         this.spawnPosition = null;
         this.gamemode = this.server.getGamemode();
         this.setLevel(this.server.getDefaultLevel());
@@ -1049,7 +1049,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     }
 
     public boolean awardAchievement(String achievementId) {
-        if (!Server.getInstance().getPropertyBoolean("achievements", true)) {
+        if (!Server.getInstance().getConfigGroup().getConfigBoolean("achievements", true)) {
             return false;
         }
 
@@ -2872,7 +2872,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                             } else if (targetEntity instanceof Player) {
                                 if ((((Player) targetEntity).getGamemode() & 0x01) > 0) {
                                     break;
-                                } else if (!this.server.getPropertyBoolean("pvp") || this.server.getDifficulty() == 0) {
+                                } else if (!this.server.getConfigGroup().getConfigBoolean("pvp") || this.server.getDifficulty() == 0) {
                                     break;
                                 }
                             }

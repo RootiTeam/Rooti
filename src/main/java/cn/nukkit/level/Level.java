@@ -333,13 +333,13 @@ public class Level implements ChunkManager, Metadatable {
         this.updateQueue = new BlockUpdateScheduler(this, levelCurrentTick);
 
         this.chunkTickRadius = Math.min(this.server.getViewDistance(),
-                Math.max(1, (Integer) this.server.getConfig("chunk-ticking.tick-radius", 4)));
-        this.chunksPerTicks = (int) this.server.getConfig("chunk-ticking.per-tick", 40);
-        this.chunkGenerationQueueSize = (int) this.server.getConfig("chunk-generation.queue-size", 8);
-        this.chunkPopulationQueueSize = (int) this.server.getConfig("chunk-generation.population-queue-size", 2);
+                Math.max(1, this.server.getConfigGroup().getPropertyInt("chunk-ticking.tick-radius", 4)));
+        this.chunksPerTicks = this.server.getConfigGroup().getPropertyInt("chunk-ticking.per-tick", 40);
+        this.chunkGenerationQueueSize = this.server.getConfigGroup().getPropertyInt("chunk-generation.queue-size", 8);
+        this.chunkPopulationQueueSize = this.server.getConfigGroup().getPropertyInt("chunk-generation.population-queue-size", 2);
         this.chunkTickList.clear();
-        this.clearChunksOnTick = (boolean) this.server.getConfig("chunk-ticking.clear-tick-list", true);
-        this.cacheChunks = (boolean) this.server.getConfig("chunk-sending.cache-chunks", false);
+        this.clearChunksOnTick = this.server.getConfigGroup().getPropertyBoolean("chunk-ticking.clear-tick-list", true);
+        this.cacheChunks = this.server.getConfigGroup().getPropertyBoolean("chunk-sending.cache-chunks", false);
         this.temporalPosition = new Position(0, 0, 0, this);
         this.temporalVector = new Vector3(0, 0, 0);
         this.tickRate = 1;
@@ -2014,7 +2014,7 @@ public class Level implements ChunkManager, Metadatable {
             Entity[] entities = this.getCollidingEntities(hand.getBoundingBox());
             int realCount = 0;
            for (Entity e : entities) {
-                if (e instanceof EntityArrow 
+                if (e instanceof EntityArrow
                         || e instanceof EntityItem
                         || (e instanceof Player && ((Player) e).isSpectator())
                         || player != null && player == e
@@ -2610,7 +2610,7 @@ public class Level implements ChunkManager, Metadatable {
         }
 
         if (!chunk.isLightPopulated() && chunk.isPopulated()
-                && (boolean) this.getServer().getConfig("chunk-ticking.light-updates", false)) {
+                && this.getServer().getConfigGroup().getPropertyBoolean("chunk-ticking.light-updates", false)) {
             this.getServer().getScheduler().scheduleAsyncTask(new LightPopulationTask(this, chunk));
         }
 

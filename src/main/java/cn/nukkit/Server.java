@@ -187,9 +187,7 @@ public class Server {
 
     private QueryRegenerateEvent queryRegenerateEvent;
 
-    private Config properties;
-    private Config config;
-    private Config rooticonfig;
+    private ServerConfigGroup configGroup;
 
     private final Map<String, Player> players = new HashMap<>();
 
@@ -204,7 +202,7 @@ public class Server {
     private Level defaultLevel = null;
 
     private final Thread currentThread;
-    
+
     Server(final String filePath, String dataPath, String pluginPath) {
         Preconditions.checkState(instance == null, "Already initialized!");
         this.logger = MainLogger.getLogger();
@@ -226,7 +224,7 @@ public class Server {
 
         this.dataPath = new File(dataPath).getAbsolutePath() + "/";
         this.pluginPath = new File(pluginPath).getAbsolutePath() + "/";
-         
+
         this.console = new RootiConsole(this);
         this.consoleThread = new ConsoleThread();
         this.consoleThread.start();
@@ -274,15 +272,11 @@ public class Server {
         this.console.setExecutingCommands(true);
         //this.console.start();
 
-        log.info("Loading " + TextFormat.GREEN + "nukkit.yml" + TextFormat.WHITE + "...");
-        this.config = new Config(this.dataPath + "nukkit.yml", Config.YAML);
-
-        log.info("Loading " + TextFormat.GREEN + "rooti.yml" + TextFormat.WHITE + "...");
-        this.rooticonfig = new Config(this.dataPath + "rooti.yml", Config.YAML);
-
-        log.info("Loading " + TextFormat.GREEN + "server properties" + TextFormat.WHITE + "...");
-        this.properties = new Config(this.dataPath + "server.properties", Config.PROPERTIES, new ConfigSection() {
-            {
+        this.configGroup = new ServerConfigGroup(
+        new Config(this.dataPath + "nukkit.yml", Config.YAML),
+        new Config(this.dataPath + "rooti.yml", Config.YAML),
+        new Config(this.dataPath + "server.properties", Config.PROPERTIES, new ConfigSection() {
+          {
                 put("motd", "Rooti Server For Minecraft: PE");
                 put("server-port", 19132);
                 put("server-ip", "0.0.0.0");
@@ -310,14 +304,15 @@ public class Server {
                 put("auto-save", true);
                 put("force-resources", false);
             }
-        });
+          })
+        );
 
-        this.forceLanguage = (Boolean) this.getConfig("settings.force-language", false);
-        this.baseLang = new BaseLang((String) this.getConfig("settings.language", BaseLang.FALLBACK_LANGUAGE));
+        this.forceLanguage = this.configGroup.getPropertyBoolean("settings.force-language", false);
+        this.baseLang = new BaseLang(this.configGroup.getPropertyString("settings.language", BaseLang.FALLBACK_LANGUAGE));
         log.info(this.getLanguage().translateString("language.selected", new String[]{getLanguage().getName(), getLanguage().getLang()}));
         log.info(getLanguage().translateString("nukkit.server.start", TextFormat.AQUA + this.getVersion() + TextFormat.WHITE));
 
-        Object poolSize = this.getConfig("settings.async-workers", "auto");
+        Object poolSize = this.configGroup.getProperty("settings.async-workers", "auto");
         if (!(poolSize instanceof Integer)) {
             try {
                 poolSize = Integer.valueOf((String) poolSize);
@@ -328,21 +323,18 @@ public class Server {
 
         ServerScheduler.WORKERS = (int) poolSize;
 
-        this.networkCompressionLevel = (int) this.getConfig("network.compression-level", 7);
-        this.networkCompressionAsync = (boolean) this.getConfig("network.async-compression", true);
+        this.networkCompressionLevel = this.configGroup.getPropertyInt("network.compression-level", 7);
+        this.networkCompressionAsync = this.configGroup.getPropertyBoolean("network.async-compression", true);
 
-        this.networkCompressionLevel = (int) this.getConfig("network.compression-level", 7);
-        this.networkCompressionAsync = (boolean) this.getConfig("network.async-compression", true);
-
-        this.autoTickRate = (boolean) this.getConfig("level-settings.auto-tick-rate", true);
-        this.autoTickRateLimit = (int) this.getConfig("level-settings.auto-tick-rate-limit", 20);
-        this.alwaysTickPlayers = (boolean) this.getConfig("level-settings.always-tick-players", false);
-        this.baseTickRate = (int) this.getConfig("level-settings.base-tick-rate", 1);
+        this.autoTickRate = this.configGroup.getPropertyBoolean("level-settings.auto-tick-rate", true);
+        this.autoTickRateLimit = this.configGroup.getPropertyInt("level-settings.auto-tick-rate-limit", 20);
+        this.alwaysTickPlayers = this.configGroup.getPropertyBoolean("level-settings.always-tick-players", false);
+        this.baseTickRate = this.configGroup.getPropertyInt("level-settings.base-tick-rate", 1);
 
         this.scheduler = new ServerScheduler();
 
-        if (this.getPropertyBoolean("enable-rcon", false)) {
-            this.rcon = new RCON(this, this.getPropertyString("rcon.password", ""), (!this.getIp().equals("")) ? this.getIp() : "0.0.0.0", this.getPropertyInt("rcon.port", this.getPort()));
+        if (this.configGroup.getConfigBoolean("enable-rcon", false)) {
+            this.rcon = new RCON(this, this.configGroup.getConfigString("rcon.password", ""), (!this.getIp().equals("")) ? this.getIp() : "0.0.0.0", this.configGroup.getConfigInt("rcon.port", this.getPort()));
         }
 
         this.entityMetadata = new EntityMetadataStore();
@@ -356,14 +348,14 @@ public class Server {
         this.banByIP = new BanList(this.dataPath + "banned-ips.json");
         this.banByIP.load();
 
-        this.maxPlayers = this.getPropertyInt("max-players", 20);
-        this.setAutoSave(this.getPropertyBoolean("auto-save", true));
+        this.maxPlayers = this.configGroup.getConfigInt("max-players", 20);
+        this.setAutoSave(this.configGroup.getConfigBoolean("auto-save", true));
 
-        if (this.getPropertyBoolean("hardcore", false) && this.getDifficulty() < 3) {
-            this.setPropertyInt("difficulty", 3);
+        if (this.configGroup.getConfigBoolean("hardcore", false) && this.getDifficulty() < 3) {
+            this.configGroup.setConfigInt("difficulty", 3);
         }
 
-        Nukkit.DEBUG = (int) this.getConfig("debug.level", 1);
+        Nukkit.DEBUG = this.configGroup.getPropertyInt("debug.level", 1);
         int logLevel = (Nukkit.DEBUG + 3) * 100;
                 org.apache.logging.log4j.Level currentLevel = Nukkit.getLogLevel();
         for (org.apache.logging.log4j.Level level : org.apache.logging.log4j.Level.values()) {
@@ -431,17 +423,17 @@ public class Server {
         Generator.addGenerator(Nether.class, "nether", Generator.TYPE_NETHER);
         //todo: add old generator and hell generator
 
-        for (String name : ((Map<String, Object>) this.getConfig("worlds", new HashMap<>())).keySet()) {
+        for (String name : ((Map<String, Object>) this.configGroup.getProperty("worlds", new HashMap<>())).keySet()) {
             if (!this.loadLevel(name)) {
                 long seed;
                 try {
-                    seed = ((Integer) this.getConfig("worlds." + name + ".seed")).longValue();
+                    seed = ((Integer) this.configGroup.getProperty("worlds." + name + ".seed")).longValue();
                 } catch (Exception e) {
                     seed = System.currentTimeMillis();
                 }
 
                 Map<String, Object> options = new HashMap<>();
-                String[] opts = ((String) this.getConfig("worlds." + name + ".generator", Generator.getGenerator("default").getSimpleName())).split(":");
+                String[] opts = ((String) this.configGroup.getProperty("worlds." + name + ".generator", Generator.getGenerator("default").getSimpleName())).split(":");
                 Class<? extends Generator> generator = Generator.getGenerator(opts[0]);
                 if (opts.length > 1) {
                     String preset = "";
@@ -458,16 +450,16 @@ public class Server {
         }
 
         if (this.getDefaultLevel() == null) {
-            String defaultName = this.getPropertyString("level-name", "world");
+            String defaultName = this.configGroup.getConfigString("level-name", "world");
             if (defaultName == null || defaultName.trim().isEmpty()) {
                 this.getLogger().warning("level-name cannot be null, using default");
                 defaultName = "world";
-                this.setPropertyString("level-name", defaultName);
+                this.configGroup.setConfigString("level-name", defaultName);
             }
 
             if (!this.loadLevel(defaultName)) {
                 long seed;
-                String seedString = String.valueOf(this.getProperty("level-seed", System.currentTimeMillis()));
+                String seedString = String.valueOf(this.configGroup.getConfig("level-seed", System.currentTimeMillis()));
                 try {
                     seed = Long.valueOf(seedString);
                 } catch (NumberFormatException e) {
@@ -479,7 +471,7 @@ public class Server {
             this.setDefaultLevel(this.getLevelByName(defaultName));
         }
 
-        this.properties.save(true);
+        this.configGroup.saveAll();
 
         if (this.getDefaultLevel() == null) {
             this.getLogger().emergency(this.getLanguage().translateString("nukkit.level.defaultError"));
@@ -488,8 +480,8 @@ public class Server {
             return;
         }
 
-        if ((int) this.getConfig("ticks-per.autosave", 6000) > 0) {
-            this.autoSaveTicks = (int) this.getConfig("ticks-per.autosave", 6000);
+        if (this.configGroup.getPropertyInt("ticks-per.autosave", 6000) > 0) {
+            this.autoSaveTicks = this.configGroup.getPropertyInt("ticks-per.autosave", 6000);
         }
 
         this.enablePlugins(PluginLoadOrder.POSTWORLD);
@@ -720,11 +712,11 @@ public class Server {
         this.commandMap.clearCommands();
 
         log.info("Reloading properties...");
-        this.properties.reload();
-        this.maxPlayers = this.getPropertyInt("max-players", 20);
+        this.configGroup.reloadConfig();
+        this.maxPlayers = this.configGroup.getConfigInt("max-players", 20);
 
-        if (this.getPropertyBoolean("hardcore", false) && this.getDifficulty() < 3) {
-            this.setPropertyInt("difficulty", 3);
+        if (this.configGroup.getConfigBoolean("hardcore", false) && this.getDifficulty() < 3) {
+            this.configGroup.setConfigInt("difficulty", 3);
         }
 
         this.banByIP.load();
@@ -756,7 +748,7 @@ public class Server {
     public void shutdown() {
         if (this.isRunning) {
             for (Player player : this.getOnlinePlayers().values()) {
-                player.close(player.getLeaveMessage(), (String) this.getConfig("settings.shutdown-message", "Server closed"));
+                player.close(player.getLeaveMessage(), this.configGroup.getConfigString("settings.shutdown-message", "Server closed"));
             }
             ServerKiller killer = new ServerKiller(90);
             killer.start();
@@ -789,7 +781,7 @@ public class Server {
             this.pluginManager.disablePlugins();
 
             for (Player player : new ArrayList<>(this.players.values())) {
-                player.close(player.getLeaveMessage(), (String) this.getConfig("settings.shutdown-message", "Server closed"));
+                player.close(player.getLeaveMessage(), this.configGroup.getPropertyString("settings.shutdown-message", "Server closed"));
             }
 
             this.getLogger().debug("Unloading all levels");
@@ -805,6 +797,7 @@ public class Server {
             this.scheduler.mainThreadHeartbeat(Integer.MAX_VALUE);
 
             this.getLogger().debug("Closing console");
+            //this.console.shutdown();
             this.consoleThread.interrupt();
 
             this.getLogger().debug("Stopping network interfaces");
@@ -824,7 +817,7 @@ public class Server {
     }
 
     public void start() {
-        if (this.getPropertyBoolean("enable-query", true)) {
+        if (this.configGroup.getConfigBoolean("enable-query", true)) {
             this.queryHandler = new QueryHandler();
         }
 
@@ -1220,15 +1213,15 @@ public class Server {
     }
 
     public int getPort() {
-        return this.getPropertyInt("server-port", 19132);
+        return this.configGroup.getConfigInt("server-port", 19132);
     }
 
     public int getViewDistance() {
-        return this.getPropertyInt("view-distance", 10);
+        return this.configGroup.getConfigInt("view-distance", 10);
     }
 
     public String getIp() {
-        return this.getPropertyString("server-ip", "0.0.0.0");
+        return this.configGroup.getConfigString("server-ip", "0.0.0.0");
     }
 
     public UUID getServerUniqueId() {
@@ -1247,19 +1240,19 @@ public class Server {
     }
 
     public String getLevelType() {
-        return this.getPropertyString("level-type", "DEFAULT");
+        return this.configGroup.getConfigString("level-type", "DEFAULT");
     }
 
     public boolean getGenerateStructures() {
-        return this.getPropertyBoolean("generate-structures", true);
+        return this.configGroup.getConfigBoolean("generate-structures", true);
     }
 
     public int getGamemode() {
-        return this.getPropertyInt("gamemode", 0) & 0b11;
+        return this.configGroup.getConfigInt("gamemode", 0) & 0b11;
     }
 
     public boolean getForceGamemode() {
-        return this.getPropertyBoolean("force-gamemode", false);
+        return this.configGroup.getConfigBoolean("force-gamemode", false);
     }
 
     public static String getGamemodeString(int mode) {
@@ -1329,38 +1322,38 @@ public class Server {
     }
 
     public int getDifficulty() {
-        return this.getPropertyInt("difficulty", 1);
+        return this.configGroup.getConfigInt("difficulty", 1);
     }
 
     public boolean hasWhitelist() {
-        return this.getPropertyBoolean("white-list", false);
+        return this.configGroup.getConfigBoolean("white-list", false);
     }
 
     public int getSpawnRadius() {
-        return this.getPropertyInt("spawn-protection", 16);
+        return this.configGroup.getConfigInt("spawn-protection", 16);
     }
 
     public boolean getAllowFlight() {
         if (getAllowFlight == null) {
-            getAllowFlight = this.getPropertyBoolean("allow-flight", false);
+            getAllowFlight = this.configGroup.getConfigBoolean("allow-flight", false);
         }
         return getAllowFlight;
     }
 
     public boolean isHardcore() {
-        return this.getPropertyBoolean("hardcore", false);
+        return this.configGroup.getConfigBoolean("hardcore", false);
     }
 
     public int getDefaultGamemode() {
-        return this.getPropertyInt("gamemode", 0);
+        return this.configGroup.getConfigInt("gamemode", 0);
     }
 
     public String getMotd() {
-        return this.getPropertyString("motd", "Rooti Server For Minecraft: PE");
+        return this.configGroup.getConfigString("motd", "Rooti Server For Minecraft: PE");
     }
 
     public boolean getForceResources() {
-        return this.getPropertyBoolean("force-resources", false);
+        return this.configGroup.getConfigBoolean("force-resources", false);
     }
 
     public MainLogger getLogger() {
@@ -1694,7 +1687,7 @@ public class Server {
         }
 
         if (!options.containsKey("preset")) {
-            options.put("preset", this.getPropertyString("generator-settings", ""));
+            options.put("preset", this.configGroup.getConfigString("generator-settings", ""));
         }
 
         if (generator == null) {
@@ -1703,7 +1696,7 @@ public class Server {
 
         if (provider == null) {
             if ((provider = LevelProviderManager.getProviderByName
-                    ((String) this.getConfig("level-settings.default-format", "anvil"))) == null) {
+                    ((String) this.configGroup.getProperty("level-settings.default-format", "anvil"))) == null) {
                 provider = LevelProviderManager.getProviderByName("anvil");
             }
         }
@@ -1797,95 +1790,6 @@ public class Server {
         return network;
     }
 
-    //Revising later...
-    public Config getConfig() {
-        return this.config;
-    }
-
-    public Config getRootiConfig() {
-        return this.rooticonfig;
-    }
-
-    public Object getRootiConfig(String variable) {
-        return this.getRootiConfig(variable, null);
-    }
-
-    public Object getRootiConfig(String variable, Object defaultValue) {
-        Object value = this.rooticonfig.get(variable);
-        return value == null ? defaultValue : value;
-    }
-
-    public Object getConfig(String variable) {
-        return this.getConfig(variable, null);
-    }
-
-    public Object getConfig(String variable, Object defaultValue) {
-        Object value = this.config.get(variable);
-        return value == null ? defaultValue : value;
-    }
-
-    public Config getProperties() {
-        return this.properties;
-    }
-
-    public Object getProperty(String variable) {
-        return this.getProperty(variable, null);
-    }
-
-    public Object getProperty(String variable, Object defaultValue) {
-        return this.properties.exists(variable) ? this.properties.get(variable) : defaultValue;
-    }
-
-    public void setPropertyString(String variable, String value) {
-        this.properties.set(variable, value);
-        this.properties.save();
-    }
-
-    public String getPropertyString(String variable) {
-        return this.getPropertyString(variable, null);
-    }
-
-    public String getPropertyString(String variable, String defaultValue) {
-        return this.properties.exists(variable) ? (String) this.properties.get(variable) : defaultValue;
-    }
-
-    public int getPropertyInt(String variable) {
-        return this.getPropertyInt(variable, null);
-    }
-
-    public int getPropertyInt(String variable, Integer defaultValue) {
-        return this.properties.exists(variable) ? (!this.properties.get(variable).equals("") ? Integer.parseInt(String.valueOf(this.properties.get(variable))) : defaultValue) : defaultValue;
-    }
-
-    public void setPropertyInt(String variable, int value) {
-        this.properties.set(variable, value);
-        this.properties.save();
-    }
-
-    public boolean getPropertyBoolean(String variable) {
-        return this.getPropertyBoolean(variable, null);
-    }
-
-    public boolean getPropertyBoolean(String variable, Object defaultValue) {
-        Object value = this.properties.exists(variable) ? this.properties.get(variable) : defaultValue;
-        if (value instanceof Boolean) {
-            return (Boolean) value;
-        }
-        switch (String.valueOf(value)) {
-            case "on":
-            case "true":
-            case "1":
-            case "yes":
-                return true;
-        }
-        return false;
-    }
-
-    public void setPropertyBoolean(String variable, boolean value) {
-        this.properties.set(variable, value ? "1" : "0");
-        this.properties.save();
-    }
-
     public PluginIdentifiableCommand getPluginCommand(String name) {
         Command command = this.commandMap.getCommand(name);
         if (command instanceof PluginIdentifiableCommand) {
@@ -1956,7 +1860,7 @@ public class Server {
     }
 
     public Map<String, List<String>> getCommandAliases() {
-        Object section = this.getConfig("aliases");
+        Object section = this.configGroup.getProperty("aliases");
         Map<String, List<String>> result = new LinkedHashMap<>();
         if (section instanceof Map) {
             for (Map.Entry entry : (Set<Map.Entry>) ((Map) section).entrySet()) {
@@ -1980,19 +1884,19 @@ public class Server {
     }
 
     public boolean shouldSavePlayerData() {
-        return (Boolean) this.getConfig("player.save-player-data", true);
+        return this.configGroup.getPropertyBoolean("player.save-player-data", true);
     }
 
     /**
      * Checks the current thread against the expected primary thread for the server.
-     * 
+     *
      * <b>Note:</b> this method should not be used to indicate the current synchronized state of the runtime. A current thread matching the main thread indicates that it is synchronized, but a mismatch does not preclude the same assumption.
      * @return true if the current thread matches the expected primary thread, false otherwise
      */
     public final boolean isPrimaryThread() {
         return (Thread.currentThread() == currentThread);
     }
-    
+
     private void registerEntities() {
         Entity.registerEntity("Arrow", EntityArrow.class);
         Entity.registerEntity("Item", EntityItem.class);
@@ -2053,6 +1957,10 @@ public class Server {
 
     public JavaCompiler getCompiler() {
         return this.compiler;
+    }
+
+    public ServerConfigGroup getConfigGroup() {
+      return configGroup;
     }
 
     public static Server getInstance() {
