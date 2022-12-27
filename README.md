@@ -4,11 +4,12 @@
 
 Software for Minecraft Pocket Edition 1.1.x forked Nukkit.
 
-Java 8 installation
+Java 19 installation
 -------------
-- `sudo apt-get update && sudo apt-get install default-jdk`
-- `sudo apt-get install openjdk-8-jdk`
-- `update-alternatives --config java`, choose /usr/lib/jvm/java-8-openjdk-amd64/jre/bin/java
+- `sudo apt-get update && sudo apt-get upgrade`
+- `wget https://download.oracle.com/java/19/latest/jdk-19_linux-x64_bin.deb`
+- `sudo apt-get -qqy install ./jdk-19_linux-x64_bin.deb`
+- `sudo update-alternatives --install /usr/bin/java java /usr/lib/jvm/jdk-19/bin/java 1919`
 - Check java version: `java -version`
 
 Building
