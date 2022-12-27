@@ -1940,7 +1940,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             this.close(this.getLeaveMessage(), "Incorrect ClientID");
             return;
         }
-        
+
         try (Timing timing = Timings.getReceiveDataPacketTiming(packet)) {
             DataPacketReceiveEvent ev = new DataPacketReceiveEvent(this, packet);
             this.server.getPluginManager().callEvent(ev);
@@ -2154,6 +2154,12 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
                     MobEquipmentPacket mobEquipmentPacket = (MobEquipmentPacket) packet;
 
+                    EntityEquipmentEvent equipmentEvent = new EntityEquipmentEvent(this, inventory.getItemInHand(), mobEquipmentPacket.item, mobEquipmentPacket.selectedSlot, mobEquipmentPacket.slot);
+                    this.server.getPluginManager().callEvent(equipmentEvent);
+                    if (equipmentEvent.isCancelled()) {
+                            break;
+                    }
+
                     if (mobEquipmentPacket.slot == 0x28 || mobEquipmentPacket.slot == 0 || mobEquipmentPacket.slot == 255) {
                         mobEquipmentPacket.slot = -1;
                     } else {
@@ -2162,6 +2168,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
                     Item item;
                     int slot;
+
                     if (this.isCreative()) {
                         item = mobEquipmentPacket.item;
                         slot = Item.getCreativeItemIndex(item);
@@ -2825,7 +2832,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     }
 
                     InteractPacket interactPacket = (InteractPacket) packet;
-                    
+
                     Entity targetEntity = this.level.getEntity(interactPacket.target);
 
                     if (targetEntity == null || !this.isAlive() || !targetEntity.isAlive()) {

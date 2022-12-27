@@ -114,10 +114,4 @@ public abstract class IterableThreadLocal<T> extends ThreadLocal<T> implements I
     public final Collection<T> getAll() {
         return Collections.unmodifiableCollection(allValues);
     }
-
-    @Override
-    protected void finalize() throws Throwable {
-        clean(this);
-        super.finalize();
-    }
 }
