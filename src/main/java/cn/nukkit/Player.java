@@ -79,7 +79,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
- * @author MagicDroidX and Box
+ * @author MagicDroidX and Box and RootiTeam
  * Nukkit Project
  */
 public class Player extends EntityHuman implements CommandSender, InventoryHolder, ChunkLoader, IPlayer {
