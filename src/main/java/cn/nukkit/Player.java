@@ -84,6 +84,8 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 public class Player extends EntityHuman implements CommandSender, InventoryHolder, ChunkLoader, IPlayer {
 
+    public static final Player[] EMPTY_ARRAY = new Player[0];
+    
     public static final int SURVIVAL = 0;
     public static final int CREATIVE = 1;
     public static final int ADVENTURE = 2;
