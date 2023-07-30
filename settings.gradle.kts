@@ -1,7 +1,5 @@
-pluginManagement {
-    plugins {
-        id("com.github.johnrengelman.shadow") version "7.1.2"
-    }
-}
-
 rootProject.name = "rooti"
+
+plugins {
+    id("org.gradle.toolchains.foojay-resolver-convention") version("0.4.0")
+}

@@ -1,7 +1,12 @@
+import com.github.jengelman.gradle.plugins.shadow.transformers.Log4j2PluginsCacheFileTransformer
+
+@Suppress("DSL_SCOPE_VIOLATION")
+
 plugins {
-    java
-    `maven-publish`
-    id("com.github.johnrengelman.shadow")
+    id("java-library")
+    id("maven-publish")
+    id("application")
+    alias(libs.plugins.shadow)
 }
 
 repositories {
@@ -10,45 +15,36 @@ repositories {
 
 group = "dev.ddosnik"
 version = "1.0-SNAPSHOT"
+description = "Software for Minecraft: Pocket Edition 1.1.x forked Nukkit"
 
 dependencies {
-    implementation("jline:jline:2.14.6")
-    implementation("net.sf.jopt-simple:jopt-simple:5.0.4")
-    implementation("net.minecrell:terminalconsoleappender:1.1.1")
-    implementation("org.jline:jline-reader:3.21.0")
-    implementation("it.unimi.dsi:fastutil:6.3")
-    implementation("org.jline:jline-terminal-jna:3.21.0")
-    implementation("org.jline:jline-terminal:3.21.0")
-    implementation("org.apache.logging.log4j:log4j-api:2.17.2")
-    implementation("org.apache.logging.log4j:log4j-core:2.17.2")
-    implementation("com.google.guava:guava:31.1-jre")
-    implementation("com.google.code.gson:gson:2.9.0")
-    implementation("org.yaml:snakeyaml:1.30")
-    implementation("io.netty:netty-all:4.1.76.Final")
-    implementation("org.iq80.leveldb:leveldb:0.12")
-    compileOnly("org.projectlombok:lombok:1.18.24")
-    annotationProcessor("org.projectlombok:lombok:1.18.24")
+    api(libs.jline)
+    api(libs.jopt.simple)
+    api(libs.terminalconsoleappender)
+    api(libs.jline.reader)
+    api(libs.fastutil)
+    api(libs.jline.terminal.jna)
+    api(libs.jline.terminal)
+    api(libs.log4j.api)
+    api(libs.log4j.core)
+    api(libs.guava)
+    api(libs.gson)
+    api(libs.snakeyaml)
+    api(libs.netty.all)
+    api(libs.leveldb)
+    compileOnly(libs.lombok)
+    annotationProcessor(libs.lombok)
 
 }
 
 java {
-    toolchain.languageVersion.set(JavaLanguageVersion.of(19))
-
-    withSourcesJar()
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(19))
+    }
 }
 
-tasks {
-    build { dependsOn(shadowJar) }
-    shadowJar {
-        archiveFileName.set("Rooti.jar")
-        transform(com.github.jengelman.gradle.plugins.shadow.transformers.Log4j2PluginsCacheFileTransformer::class.java)
-
-        manifest {
-            attributes["Main-Class"] = "cn.nukkit.Nukkit"
-            attributes["Multi-Release"] = "true"
-        }
-    }
-    withType<JavaCompile> { options.encoding = "UTF-8" }
+application {
+    mainClass.set("cn.nukkit.Nukkit")
 }
 
 publishing {
@@ -64,5 +60,28 @@ publishing {
 
     repositories {
         mavenLocal()
+    }
+}
+
+tasks {
+    compileJava {
+        options.encoding = "UTF-8"
+    }
+
+    jar {
+        archiveClassifier.set("dev")
+    }
+
+    shadowJar {
+        manifest.attributes["Multi-Release"] = "true"
+
+        transform(Log4j2PluginsCacheFileTransformer())
+
+        destinationDirectory.set(file("$projectDir/target"))
+        archiveClassifier.set("")
+    }
+
+    javadoc {
+        options.encoding = "UTF-8"
     }
 }
