@@ -15,8 +15,8 @@ Java 19 installation
 Building
 -------------
 - `./gradlew build --no-daemon`
-- Jar file (Rooti.jar) is located in build/libs
+- Jar file (rooti-1.0-SNAPSHOT.jar) is located in target
 
 Running
 -------------
-- `java -Xmx1G -jar Rooti.jar`
+- `java -Xmx1G -jar rooti-1.0-SNAPSHOT.jar`
