@@ -22,8 +22,8 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  */
 public class Socket extends ChannelInboundHandlerAdapter{
 
-	protected final MainLogger logger;
-	protected InternetAddress bindAddress;
+    protected final MainLogger logger;
+    protected InternetAddress bindAddress;
     protected Bootstrap bootstrap;
     protected EventLoopGroup group;
     protected Channel channel;
